@@ -6,6 +6,28 @@ import {
   updateWatchlistItem,
   removeFromWatchlist
 } from "../services/api";
+import { getAnimeTitle, getAnimeJapaneseTitle } from "../utils/animeTitles";
+
+const STATUS_OPTIONS = [
+  { value: "watching", label: "Watching" },
+  { value: "completed", label: "Completed" },
+  { value: "plan_to_watch", label: "Plan to Watch" },
+  { value: "on_hold", label: "On Hold" },
+  { value: "dropped", label: "Dropped" }
+];
+
+function formatStatus(status) {
+  if (!status) return null;
+  return status
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function formatSeason(seasonObj) {
+  if (!seasonObj || !seasonObj.season) return null;
+  const s = seasonObj.season.charAt(0).toUpperCase() + seasonObj.season.slice(1);
+  return `${s} ${seasonObj.year || ""}`.trim();
+}
 
 export default function AnimeDetails() {
   const { mal_id } = useParams();
@@ -23,9 +45,11 @@ export default function AnimeDetails() {
         setLoading(true);
         setError(null);
         const data = await getAnimeDetails(mal_id);
-        if (isMounted) setAnime(data);
+        if (isMounted) {
+          setAnime(data);
+        }
       } catch (err) {
-        if (isMounted) setError(err.message || "Failed to load anime details");
+        if (isMounted) setError(err.message || "Failed to load anime details.");
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -38,13 +62,26 @@ export default function AnimeDetails() {
     };
   }, [mal_id]);
 
+  // Local state for episode input to prevent unnecessary requests on every keystroke
+  const serverEpisodes = anime?.episodes_watched ?? 0;
+  const [prevServerEpisodes, setPrevServerEpisodes] = useState(serverEpisodes);
+  const [localEpisodes, setLocalEpisodes] = useState(serverEpisodes);
+
+  if (serverEpisodes !== prevServerEpisodes) {
+    setPrevServerEpisodes(serverEpisodes);
+    setLocalEpisodes(serverEpisodes);
+  }
+
+  const resolvedEnglishTitle = getAnimeTitle(anime);
+  const japaneseTitle = getAnimeJapaneseTitle(anime);
+
   async function handleAddToWatchlist() {
     if (!anime) return;
     try {
       setSaving(true);
       await addToWatchlist({
         mal_id: anime.id,
-        title: anime.title,
+        title: resolvedEnglishTitle, // Store the resolved English title!
         poster: anime.main_picture?.large || anime.main_picture?.medium,
         media_type: anime.media_type,
         synopsis: anime.synopsis,
@@ -60,17 +97,19 @@ export default function AnimeDetails() {
         watchlist_status: "plan_to_watch",
         episodes_watched: 0
       }));
+      setLocalEpisodes(0);
 
-      setActionMessage("Added to your watchlist!");
+      setActionMessage("Added to your Watchlist");
       setTimeout(() => setActionMessage(null), 3000);
     } catch (err) {
-      setError(err.message || "Could not add to watchlist");
+      setError(err.message || "Could not add to watchlist.");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleStatusChange(newStatus) {
+    if (!anime) return;
     try {
       setSaving(true);
       await updateWatchlistItem(anime.id, { status: newStatus });
@@ -78,32 +117,63 @@ export default function AnimeDetails() {
         ...prev,
         watchlist_status: newStatus
       }));
-      setActionMessage("Status updated!");
-      setTimeout(() => setActionMessage(null), 3000);
+      setActionMessage("Watch status updated");
+      setTimeout(() => setActionMessage(null), 2500);
     } catch (err) {
-      setError(err.message || "Failed to update status");
+      setError(err.message || "Failed to update status.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleEpisodeChange(count) {
-    const validCount = Math.max(0, count);
+  async function saveEpisodeCount(targetCount) {
+    if (!anime) return;
+    const maxEp = anime.num_episodes || 9999;
+    const clamped = Math.max(0, Math.min(targetCount, maxEp));
+
     try {
       setSaving(true);
-      await updateWatchlistItem(anime.id, { episodes_watched: validCount });
+      await updateWatchlistItem(anime.id, { episodes_watched: clamped });
       setAnime((prev) => ({
         ...prev,
-        episodes_watched: validCount
+        episodes_watched: clamped
       }));
+      setLocalEpisodes(clamped);
     } catch (err) {
-      setError(err.message || "Failed to update episode count");
+      setError(err.message || "Failed to update episodes.");
+      // Rollback local state
+      setLocalEpisodes(anime.episodes_watched || 0);
     } finally {
       setSaving(false);
+    }
+  }
+
+  function handleEpisodeStep(delta) {
+    const current = anime?.episodes_watched || 0;
+    const next = current + delta;
+    if (next < 0) return;
+    if (anime?.num_episodes && next > anime.num_episodes) return;
+    saveEpisodeCount(next);
+  }
+
+  function handleEpisodeInputBlur() {
+    const parsed = parseInt(localEpisodes, 10);
+    const count = isNaN(parsed) ? (anime?.episodes_watched || 0) : parsed;
+    if (count !== (anime?.episodes_watched || 0)) {
+      saveEpisodeCount(count);
+    } else {
+      setLocalEpisodes(count);
+    }
+  }
+
+  function handleEpisodeKeyDown(e) {
+    if (e.key === "Enter") {
+      e.target.blur();
     }
   }
 
   async function handleScoreChange(scoreVal) {
+    if (!anime) return;
     const score = scoreVal === "" ? null : Number(scoreVal);
     try {
       setSaving(true);
@@ -112,17 +182,18 @@ export default function AnimeDetails() {
         ...prev,
         user_score: score
       }));
-      setActionMessage("Rating saved!");
-      setTimeout(() => setActionMessage(null), 3000);
+      setActionMessage("Rating saved");
+      setTimeout(() => setActionMessage(null), 2500);
     } catch (err) {
-      setError(err.message || "Failed to update score");
+      setError(err.message || "Failed to update score.");
     } finally {
       setSaving(false);
     }
   }
 
   async function handleRemove() {
-    if (!window.confirm("Remove this anime from your watchlist?")) return;
+    if (!anime) return;
+    if (!window.confirm(`Remove "${resolvedEnglishTitle}" from your watchlist?`)) return;
     try {
       setSaving(true);
       await removeFromWatchlist(anime.id);
@@ -133,10 +204,11 @@ export default function AnimeDetails() {
         episodes_watched: 0,
         user_score: null
       }));
-      setActionMessage("Removed from watchlist.");
-      setTimeout(() => setActionMessage(null), 3000);
+      setLocalEpisodes(0);
+      setActionMessage("Removed from watchlist");
+      setTimeout(() => setActionMessage(null), 2500);
     } catch (err) {
-      setError(err.message || "Failed to remove from watchlist");
+      setError(err.message || "Failed to remove from watchlist.");
     } finally {
       setSaving(false);
     }
@@ -144,166 +216,264 @@ export default function AnimeDetails() {
 
   if (loading) {
     return (
-      <main className="anime-detail">
-        <p className="loading-state">Loading anime details...</p>
+      <main className="details-page-view">
+        <div className="details-loading font-mono">
+          <span>Loading anime details...</span>
+        </div>
       </main>
     );
   }
 
-  if (error || !anime) {
+  if (error && !anime) {
     return (
-      <main className="anime-detail">
-        <Link className="back-link" to="/">
-          ← Back to search
-        </Link>
-        <p className="error-message">{error || "Anime not found"}</p>
+      <main className="details-page-view">
+        <div className="details-back-bar">
+          <Link to="/search" className="back-nav-link font-headline">
+            ← Back to Explore
+          </Link>
+        </div>
+        <div className="details-error-box font-mono">
+          <span>{error || "Anime not found in catalogue."}</span>
+        </div>
       </main>
     );
   }
+
+  const posterImg = anime.main_picture?.large || anime.main_picture?.medium;
+  const mediaType = anime.media_type ? anime.media_type.toUpperCase() : null;
+  const releaseYear = anime.start_date
+    ? anime.start_date.slice(0, 4)
+    : anime.start_season?.year || null;
+  const statusDisplay = formatStatus(anime.status);
+  const seasonDisplay = formatSeason(anime.start_season);
+  const studioNames = anime.studios?.map((s) => s.name).join(", ");
+  const sourceMaterial = anime.source ? formatStatus(anime.source) : null;
 
   return (
-    <main className="anime-detail">
-      {actionMessage && <div className="watchlist-success">{actionMessage}</div>}
+    <main className="details-page-view">
+      {/* Toast Alert */}
+      {actionMessage && (
+        <div className="toast-notification font-headline">
+          <span>✓ {actionMessage}</span>
+        </div>
+      )}
 
-      <Link className="back-link" to="/">
-        ← Back to search
-      </Link>
+      {/* Top Back Navigation */}
+      <div className="details-back-bar">
+        <Link to="/search" className="back-nav-link font-headline">
+          ← Back to Explore
+        </Link>
+      </div>
 
-      {/* Hero Section */}
-      <section className="anime-hero">
-        <div className="anime-detail-poster-container">
-          {anime.main_picture?.large && (
-            <img
-              className="anime-detail-poster"
-              src={anime.main_picture.large}
-              alt={anime.title}
-            />
+      {/* ======================================================================
+          SECTION A: ANIME IDENTITY & HERO
+          Clean two-column composition: artwork anchor on left, English title,
+          Japanese title underneath, and key metadata on right.
+          ====================================================================== */}
+      <section className="details-hero-section">
+        {/* Left Column: Artwork & Score */}
+        <div className="details-art-column">
+          <div className="details-poster-frame">
+            {posterImg ? (
+              <img
+                src={posterImg}
+                alt={resolvedEnglishTitle}
+                className="details-img"
+              />
+            ) : (
+              <div className="details-empty-poster font-mono">No Artwork</div>
+            )}
+
+            {/* Score Strip */}
+            {anime.mean && (
+              <div className="details-score-badge font-mono">
+                <span className="star-icon">★</span>
+                <span className="score-val">{Number(anime.mean).toFixed(2)}</span>
+                <span className="score-total">/ 10</span>
+              </div>
+            )}
+          </div>
+
+          {/* Optional Rank / Popularity below artwork */}
+          {(anime.rank || anime.popularity) && (
+            <div className="details-rank-pills font-mono">
+              {anime.rank ? <span>Rank #{anime.rank}</span> : null}
+              {anime.popularity ? <span>Popularity #{anime.popularity}</span> : null}
+            </div>
           )}
         </div>
 
-        <div className="anime-detail-main">
-          <div className="anime-detail-heading">
-            <span className="detail-type">{anime.media_type || "Anime"}</span>
-            <h1>{anime.title}</h1>
-            {anime.alternative_titles?.en && (
-              <p className="alternative-title">{anime.alternative_titles.en}</p>
-            )}
+        {/* Right Column: Title, Metadata, Summary */}
+        <div className="details-identity-column">
+          {/* Subtle Top Metadata Line */}
+          <div className="details-meta-line font-mono">
+            {mediaType && <span className="meta-type-tag">{mediaType}</span>}
+            {releaseYear && <span>{releaseYear}</span>}
+            {anime.num_episodes && <span>• {anime.num_episodes} eps</span>}
+            {statusDisplay && <span>• {statusDisplay}</span>}
           </div>
 
-          {/* Quick Stats */}
-          <div className="anime-stats">
-            <div className="stat">
-              <span className="stat-label">Score</span>
-              <span className="stat-value">{anime.mean || "N/A"}</span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Rank</span>
-              <span className="stat-value">
-                {anime.rank ? `#${anime.rank}` : "N/A"}
-              </span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Popularity</span>
-              <span className="stat-value">
-                {anime.popularity ? `#${anime.popularity}` : "N/A"}
-              </span>
-            </div>
-            <div className="stat">
-              <span className="stat-label">Episodes</span>
-              <span className="stat-value">{anime.num_episodes || "N/A"}</span>
-            </div>
-          </div>
+          {/* Primary English Heading */}
+          <h1 className="details-primary-title font-condensed">
+            {resolvedEnglishTitle}
+          </h1>
 
-          {/* Airing Status & Dates */}
-          <div className="detail-tags">
-            {anime.status && (
-              <span className="detail-tag">
-                {anime.status.replaceAll("_", " ")}
-              </span>
-            )}
-            {anime.start_date && (
-              <span className="detail-tag">Aired: {anime.start_date}</span>
-            )}
-            {anime.end_date && (
-              <span className="detail-tag">to {anime.end_date}</span>
-            )}
-          </div>
+          {/* Japanese Subtitle (only if provided) */}
+          {japaneseTitle && (
+            <h2 className="details-japanese-title font-jp">
+              {japaneseTitle}
+            </h2>
+          )}
 
           {/* Genres */}
           {anime.genres && anime.genres.length > 0 && (
-            <div className="genres">
-              {anime.genres.map((genre) => (
-                <span key={genre.id || genre.name} className="genre">
-                  {genre.name}
-                </span>
+            <div className="details-genres-row font-headline">
+              {anime.genres.map((g) => (
+                <Link
+                  key={g.id || g.name}
+                  to={`/search?q=${encodeURIComponent(g.name)}`}
+                  className="genre-tag-link"
+                >
+                  {g.name}
+                </Link>
               ))}
             </div>
           )}
 
-          {/* Watchlist Controls */}
-          <div className="watchlist-action-panel">
+          {/* Concise Metadata Summary */}
+          <div className="details-summary-strip font-mono">
+            {studioNames && (
+              <div className="summary-item">
+                <span className="summary-label">Studio:</span>
+                <strong className="summary-val font-headline">{studioNames}</strong>
+              </div>
+            )}
+            {seasonDisplay && (
+              <div className="summary-item">
+                <span className="summary-label">Season:</span>
+                <span className="summary-val">{seasonDisplay}</span>
+              </div>
+            )}
+            {sourceMaterial && (
+              <div className="summary-item">
+                <span className="summary-label">Source:</span>
+                <span className="summary-val">{sourceMaterial}</span>
+              </div>
+            )}
+          </div>
+
+          {/* ======================================================================
+              SECTION B: WATCHLIST INTERACTION
+              Grouped, practical controls; saves without triggering excess requests.
+              ====================================================================== */}
+          <div className="details-watchlist-section">
             {!anime.in_watchlist ? (
-              <button
-                type="button"
-                className="watchlist-button"
-                onClick={handleAddToWatchlist}
-                disabled={saving}
-              >
-                <span className="watchlist-icon">＋</span> Add to Watchlist
-              </button>
+              <div className="watchlist-cta-box">
+                <button
+                  type="button"
+                  className="btn-add-watchlist-action font-headline"
+                  onClick={handleAddToWatchlist}
+                  disabled={saving}
+                >
+                  + Add to Watchlist
+                </button>
+                <span className="watchlist-cta-hint font-mono">
+                  Save to track episode progress, rating, and status.
+                </span>
+              </div>
             ) : (
-              <div className="watchlist-manage-box">
-                <span className="in-watchlist-badge">✓ In Watchlist</span>
-                <div className="watchlist-controls-row">
-                  <label>
-                    Status:
+              <div className="watchlist-active-deck">
+                <div className="watchlist-controls-row font-headline">
+                  {/* Status Dropdown */}
+                  <div className="deck-control-group">
+                    <label htmlFor="details-status-select" className="deck-label font-mono">
+                      Status:
+                    </label>
                     <select
+                      id="details-status-select"
                       value={anime.watchlist_status || "plan_to_watch"}
                       onChange={(e) => handleStatusChange(e.target.value)}
                       disabled={saving}
+                      className="deck-select"
                     >
-                      <option value="watching">Watching</option>
-                      <option value="completed">Completed</option>
-                      <option value="on_hold">On Hold</option>
-                      <option value="dropped">Dropped</option>
-                      <option value="plan_to_watch">Plan to Watch</option>
+                      {STATUS_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
                     </select>
-                  </label>
+                  </div>
 
-                  <label>
-                    Episodes Watched:
-                    <div className="ep-counter">
+                  {/* Episode Stepper & Input */}
+                  <div className="deck-control-group">
+                    <label htmlFor="details-episodes-input" className="deck-label font-mono">
+                      Episodes:
+                    </label>
+                    <div className="deck-ep-box font-mono">
+                      <button
+                        type="button"
+                        className="ep-step-btn minus"
+                        onClick={() => handleEpisodeStep(-1)}
+                        disabled={saving || (anime.episodes_watched || 0) <= 0}
+                        aria-label="Decrease episode"
+                      >
+                        -
+                      </button>
                       <input
+                        id="details-episodes-input"
                         type="number"
                         min="0"
                         max={anime.num_episodes || 9999}
-                        value={anime.episodes_watched || 0}
-                        onChange={(e) => handleEpisodeChange(Number(e.target.value))}
+                        value={localEpisodes}
+                        onChange={(e) => setLocalEpisodes(e.target.value)}
+                        onBlur={handleEpisodeInputBlur}
+                        onKeyDown={handleEpisodeKeyDown}
                         disabled={saving}
+                        className="deck-ep-input"
                       />
-                      <span>/ {anime.num_episodes || "?"}</span>
+                      <span className="ep-total-label">
+                        / {anime.num_episodes || "?"}
+                      </span>
+                      <button
+                        type="button"
+                        className="ep-step-btn plus"
+                        onClick={() => handleEpisodeStep(1)}
+                        disabled={
+                          saving ||
+                          Boolean(anime.num_episodes && (anime.episodes_watched || 0) >= anime.num_episodes)
+                        }
+                        aria-label="Increase episode"
+                      >
+                        +1
+                      </button>
                     </div>
-                  </label>
+                  </div>
 
-                  <label>
-                    Score:
+                  {/* User Rating */}
+                  <div className="deck-control-group">
+                    <label htmlFor="details-score-select" className="deck-label font-mono">
+                      My Rating:
+                    </label>
                     <select
+                      id="details-score-select"
                       value={anime.user_score ?? ""}
                       onChange={(e) => handleScoreChange(e.target.value)}
                       disabled={saving}
+                      className="deck-select"
                     >
                       <option value="">No score</option>
                       {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1].map((s) => (
                         <option key={s} value={s}>
-                          ★ {s}
+                          ★ {s} / 10
                         </option>
                       ))}
                     </select>
-                  </label>
+                  </div>
 
+                  {/* Secondary Remove Action */}
                   <button
                     type="button"
-                    className="remove-watchlist-button"
+                    className="btn-remove-deck-action font-headline"
                     onClick={handleRemove}
                     disabled={saving}
                   >
@@ -316,46 +486,106 @@ export default function AnimeDetails() {
         </div>
       </section>
 
-      {/* Synopsis Section */}
-      <section className="detail-section">
-        <h2>Synopsis</h2>
-        <p className="synopsis">{anime.synopsis || "No synopsis available."}</p>
-      </section>
+      {/* ======================================================================
+          LOWER CONTENT: SECTIONS C & D
+          ====================================================================== */}
+      <div className="details-body-grid">
+        {/* ====================================================================
+            SECTION C: SYNOPSIS
+            Dedicated readable prose section with comfortable line length
+            ==================================================================== */}
+        <section className="details-synopsis-section">
+          <h3 className="details-section-heading font-condensed">SYNOPSIS</h3>
+          <div className="synopsis-prose font-body">
+            {anime.synopsis ? (
+              anime.synopsis
+                .split("\n\n")
+                .filter((p) => p.trim().length > 0)
+                .map((paragraph, index) => (
+                  <p key={index}>{paragraph.trim()}</p>
+                ))
+            ) : (
+              <p className="synopsis-empty font-mono">No synopsis available for this title.</p>
+            )}
+          </div>
+        </section>
 
-      {/* Information Grid */}
-      <section className="detail-section">
-        <h2>Information</h2>
-        <div className="information-grid">
-          <div>
-            <span className="info-label">Type</span>
-            <span className="info-value">{anime.media_type || "N/A"}</span>
-          </div>
-          <div>
-            <span className="info-label">Episodes</span>
-            <span className="info-value">{anime.num_episodes || "N/A"}</span>
-          </div>
-          <div>
-            <span className="info-label">Status</span>
-            <span className="info-value">
-              {anime.status ? anime.status.replaceAll("_", " ") : "N/A"}
-            </span>
-          </div>
-          <div>
-            <span className="info-label">Start Date</span>
-            <span className="info-value">{anime.start_date || "N/A"}</span>
-          </div>
-          <div>
-            <span className="info-label">End Date</span>
-            <span className="info-value">{anime.end_date || "N/A"}</span>
-          </div>
-          <div>
-            <span className="info-label">Studios</span>
-            <span className="info-value">
-              {anime.studios?.map((s) => s.name).join(", ") || "N/A"}
-            </span>
-          </div>
-        </div>
-      </section>
+        {/* ====================================================================
+            SECTION D: ANIME INFORMATION (SPECIFICATIONS)
+            Clean, structured specification list; only displays supplied fields.
+            ==================================================================== */}
+        <section className="details-specs-section">
+          <h3 className="details-section-heading font-condensed">ANIME INFORMATION</h3>
+          <dl className="specs-list font-mono">
+            {japaneseTitle && (
+              <div className="specs-row">
+                <dt className="specs-term">Japanese Title</dt>
+                <dd className="specs-desc font-jp">{japaneseTitle}</dd>
+              </div>
+            )}
+
+            {mediaType && (
+              <div className="specs-row">
+                <dt className="specs-term">Media Type</dt>
+                <dd className="specs-desc">{mediaType}</dd>
+              </div>
+            )}
+
+            {anime.num_episodes ? (
+              <div className="specs-row">
+                <dt className="specs-term">Episodes</dt>
+                <dd className="specs-desc">{anime.num_episodes}</dd>
+              </div>
+            ) : null}
+
+            {statusDisplay && (
+              <div className="specs-row">
+                <dt className="specs-term">Status</dt>
+                <dd className="specs-desc">{statusDisplay}</dd>
+              </div>
+            )}
+
+            {(anime.start_date || anime.end_date) && (
+              <div className="specs-row">
+                <dt className="specs-term">Airing Period</dt>
+                <dd className="specs-desc">
+                  {anime.start_date || "?"} to {anime.end_date || "Present"}
+                </dd>
+              </div>
+            )}
+
+            {seasonDisplay && (
+              <div className="specs-row">
+                <dt className="specs-term">Season</dt>
+                <dd className="specs-desc">{seasonDisplay}</dd>
+              </div>
+            )}
+
+            {studioNames && (
+              <div className="specs-row">
+                <dt className="specs-term">Studios</dt>
+                <dd className="specs-desc font-headline">{studioNames}</dd>
+              </div>
+            )}
+
+            {sourceMaterial && (
+              <div className="specs-row">
+                <dt className="specs-term">Source Material</dt>
+                <dd className="specs-desc">{sourceMaterial}</dd>
+              </div>
+            )}
+
+            {anime.genres && anime.genres.length > 0 && (
+              <div className="specs-row">
+                <dt className="specs-term">Genres</dt>
+                <dd className="specs-desc">
+                  {anime.genres.map((g) => g.name).join(", ")}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </section>
+      </div>
     </main>
   );
 }

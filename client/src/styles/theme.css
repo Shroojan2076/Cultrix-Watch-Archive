@@ -1,37 +1,144 @@
-:root {
+@import "tailwindcss";
 
-    /* Colors */
-    --color-background: #0f1117;
-    --color-surface: #171a23;
-    --color-surface-hover: #202430;
+@layer base {
+  :root {
+    /* ==========================================================================
+       GEKKAN ANIME // 月刊アニメ
+       Restrained Editorial Palette: Aged Paper, Carbon Charcoal, Selective Vermilion
+       ========================================================================== */
 
-    --color-primary: #7c5cff;
-    --color-primary-hover: #6948e8;
-    
-    --color-text: #f5f5f5;
-    --color-text-muted: #9da3b4;
-    
-    --color-border: #292e3a;
-    --color-overlay: rgba(0, 0, 0, 0.75);
+    /* Dark Carbon Backgrounds */
+    --color-bg-base: #0E1013;
+    --color-bg-subtle: #14171C;
+    --color-surface: #181C22;
+    --color-surface-hover: #20252E;
+    --color-surface-sunken: #090B0D;
 
+    /* Natural Paper Surfaces for High-Contrast Editorial Sections */
+    --color-paper: #F5F2EB;
+    --color-paper-light: #FAF8F4;
+    --color-paper-dim: #E8E4DA;
+    --color-paper-ink: #121418;
 
-    /* Typography */
-    --font-main: Arial, sans-serif;
+    /* Typographic Ink Scale */
+    --color-text-main: #F4F2EC;
+    --color-text-secondary: #B8B5AD;
+    --color-text-muted: #7E828C;
+    --color-text-faint: #4B4E58;
 
+    /* Selective Accents */
+    --color-vermilion: #E23826;
+    --color-vermilion-hover: #FA422F;
+    --color-acid: #D8F722;
+    --color-rating-gold: #FFB703;
 
-    /* Layout */
-    --content-width: 1200px;
+    /* Subtle Hairline Borders */
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-subtle: rgba(255, 255, 255, 0.05);
+    --color-border-strong: rgba(255, 255, 255, 0.2);
+    --color-border-paper: rgba(18, 20, 24, 0.15);
 
-    --spacing-xs: 4px;
-    --spacing-sm: 8px;
-    --spacing-md: 16px;
-    --spacing-lg: 24px;
-    --spacing-xl: 32px;
+    /* Font Families */
+    --font-condensed: 'Bebas Neue', -apple-system, sans-serif;
+    --font-display: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-headline: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-jp: 'Noto Sans JP', sans-serif;
 
+    /* Layout Constants */
+    --content-max-width: 1360px;
+  }
 
-    /* UI */
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
+  html {
+    font-family: var(--font-body);
+    background-color: var(--color-bg-base);
+    color: var(--color-text-main);
+    scroll-behavior: smooth;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
 
+  body {
+    min-height: 100vh;
+    background-color: var(--color-bg-base);
+    color: var(--color-text-main);
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-vermilion);
+    color: #FFFFFF;
+  }
+}
+
+/* ==========================================================================
+   Typography & Stamp Utilities
+   ========================================================================== */
+.font-condensed {
+  font-family: var(--font-condensed);
+  letter-spacing: 0.03em;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-headline {
+  font-family: var(--font-headline);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-jp {
+  font-family: var(--font-jp);
+}
+
+/* Subtle Japanese Brand Stamp */
+.jp-brand-mark {
+  font-family: var(--font-jp);
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  background-color: var(--color-vermilion);
+  color: #FFFFFF;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+}
+
+/* Paper Contrast Slab */
+.paper-slab {
+  background-color: var(--color-paper);
+  color: var(--color-paper-ink);
+  border: 1px solid var(--color-border-paper);
+}
+
+/* Carbon Surface */
+.ink-slab {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Clean Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #252830;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-vermilion);
 }

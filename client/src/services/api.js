@@ -1,5 +1,28 @@
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+export async function getAnimeRanking(rankingType = "all", limit = 10) {
+    try {
+        const response = await fetch(
+            `${API_URL}/ranking?type=${encodeURIComponent(rankingType)}&limit=${limit}`,
+            {
+                headers: {
+                    "Accept": "application/json"
+                }
+            }
+        );
+
+        if (response.ok) {
+            const data = await response.json();
+            return data;
+        }
+    } catch {
+        // Fall back gracefully to search if ranking route is unavailable
+    }
+
+    const fallbackQuery = rankingType === "airing" ? "Airing" : rankingType === "bypopularity" ? "Popular" : "Top";
+    return searchAnime(fallbackQuery);
+}
+
 export async function searchAnime(query) {
     const response = await fetch(`${API_URL}/`, {
         method: "POST",
