@@ -1,16 +1,22 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useMode } from "../context/useMode";
 
 export default function Header() {
   const [query, setQuery] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const { isAnime, isCinema, switchMode, homePath, explorePath, watchlistPath } = useMode();
 
   function handleSubmit(event) {
     event.preventDefault();
     if (!query.trim()) return;
 
-    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    if (isCinema) {
+      navigate(`/cinema/explore?q=${encodeURIComponent(query.trim())}`);
+    } else {
+      navigate(`/anime/explore?q=${encodeURIComponent(query.trim())}`);
+    }
     setQuery("");
     setMobileMenuOpen(false);
   }
@@ -20,19 +26,41 @@ export default function Header() {
       <div className="masthead-container">
         {/* Brand Link */}
         <div className="masthead-brand">
-          <Link to="/" className="brand-link" onClick={() => setMobileMenuOpen(false)}>
-            <span className="jp-brand-mark">月刊</span>
+          <Link to={homePath} className="brand-link" onClick={() => setMobileMenuOpen(false)}>
+            <span className="jp-brand-mark">{isCinema ? "キネマ" : "月刊"}</span>
             <div className="brand-text">
-              <span className="brand-title font-display">GEKKAN ANIME</span>
-              <span className="brand-sub font-mono">ANIME ARCHIVE</span>
+              <span className="brand-title font-display">YŪGEN INDEX</span>
+              <span className="brand-sub font-mono">{isCinema ? "CINÉMATHÈQUE // 映画の記憶" : "ANIME ARCHIVE // アニメ"}</span>
             </div>
           </Link>
+        </div>
+
+        {/* Medium / Mode Switcher */}
+        <div className="medium-switcher font-mono" role="group" aria-label="Select discovery medium">
+          <button
+            type="button"
+            className={`medium-tab ${isAnime ? "active" : ""}`}
+            onClick={() => switchMode("anime")}
+            aria-pressed={isAnime}
+          >
+            <span className="medium-tab-indicator"></span>
+            ANIME
+          </button>
+          <button
+            type="button"
+            className={`medium-tab ${isCinema ? "active" : ""}`}
+            onClick={() => switchMode("cinema")}
+            aria-pressed={isCinema}
+          >
+            <span className="medium-tab-indicator"></span>
+            CINEMA
+          </button>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="desktop-nav">
           <NavLink
-            to="/"
+            to={homePath}
             end
             className={({ isActive }) =>
               isActive ? "nav-item active font-headline" : "nav-item font-headline"
@@ -41,7 +69,7 @@ export default function Header() {
             Home
           </NavLink>
           <NavLink
-            to="/search"
+            to={explorePath}
             className={({ isActive }) =>
               isActive ? "nav-item active font-headline" : "nav-item font-headline"
             }
@@ -49,7 +77,7 @@ export default function Header() {
             Explore
           </NavLink>
           <NavLink
-            to="/watchlist"
+            to={watchlistPath}
             className={({ isActive }) =>
               isActive ? "nav-item active font-headline" : "nav-item font-headline"
             }
@@ -79,7 +107,7 @@ export default function Header() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search anime..."
+              placeholder={isCinema ? "Search cinema & films..." : "Search anime..."}
               className="header-search-input"
             />
           </form>
@@ -99,8 +127,32 @@ export default function Header() {
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
         <div className="mobile-nav-drawer font-headline">
+          {/* Mobile Mode Switcher */}
+          <div className="mobile-medium-switcher font-mono">
+            <button
+              type="button"
+              className={`mobile-medium-btn ${isAnime ? "active" : ""}`}
+              onClick={() => {
+                switchMode("anime");
+                setMobileMenuOpen(false);
+              }}
+            >
+              ANIME
+            </button>
+            <button
+              type="button"
+              className={`mobile-medium-btn ${isCinema ? "active" : ""}`}
+              onClick={() => {
+                switchMode("cinema");
+                setMobileMenuOpen(false);
+              }}
+            >
+              CINEMA
+            </button>
+          </div>
+
           <NavLink
-            to="/"
+            to={homePath}
             end
             className="mobile-nav-link"
             onClick={() => setMobileMenuOpen(false)}
@@ -108,18 +160,18 @@ export default function Header() {
             Home
           </NavLink>
           <NavLink
-            to="/search"
+            to={explorePath}
             className="mobile-nav-link"
             onClick={() => setMobileMenuOpen(false)}
           >
-            Explore
+            Explore {isCinema ? "Cinema" : "Anime"}
           </NavLink>
           <NavLink
-            to="/watchlist"
+            to={watchlistPath}
             className="mobile-nav-link"
             onClick={() => setMobileMenuOpen(false)}
           >
-            Watchlist
+            Watchlist ({isCinema ? "Cinema" : "Anime"})
           </NavLink>
         </div>
       )}

@@ -261,7 +261,7 @@ export default function Watchlist() {
                 <p className="empty-desc">
                   Explore anime titles in the catalogue to start tracking episodes and ratings.
                 </p>
-                <Link to="/search" className="btn-primary-action font-headline">
+                <Link to="/anime/explore" className="btn-primary-action font-headline">
                   Explore Anime →
                 </Link>
               </div>

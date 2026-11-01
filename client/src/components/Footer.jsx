@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
+import { useMode } from "../context/useMode";
 
 export default function Footer() {
+  const { switchMode, isCinema } = useMode();
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -11,52 +14,83 @@ export default function Footer() {
         {/* Distro Column */}
         <div className="footer-col-about">
           <div className="footer-brand">
-            <span className="jp-brand-mark">月刊</span>
-            <span className="footer-title font-display">GEKKAN ANIME</span>
+            <span className="jp-brand-mark">{isCinema ? "キネマ" : "月刊"}</span>
+            <span className="footer-title font-display">YŪGEN INDEX</span>
           </div>
           <p className="footer-manifesto">
-            An independent anime catalogue and personal tracker. Curated for those who appreciate
-            storytelling depth, bold art direction, and hand-drawn animation craft.
+            An independent dual-medium catalogue and discovery archive. Dedicated to lovers of Japanese animation craft and boundary-pushing cinema worldwide.
           </p>
           <div className="footer-meta font-mono">
-            <span>Powered by the MyAnimeList API</span>
+            <span>Anime data via MyAnimeList • Cinema data via TMDB</span>
           </div>
         </div>
 
-        {/* Explore Links */}
+        {/* Medium Portals */}
         <div className="footer-col-links">
-          <span className="footer-heading font-headline">Explore</span>
+          <span className="footer-heading font-headline">Medium Portals</span>
           <ul>
             <li>
-              <Link to="/search">All Anime</Link>
+              <Link to="/anime" onClick={() => switchMode("anime")}>
+                ✦ Anime Archive
+              </Link>
             </li>
             <li>
-              <Link to="/search?q=Cyberpunk">Cyberpunk</Link>
+              <Link to="/anime/explore" onClick={() => switchMode("anime")}>
+                Anime Catalogue
+              </Link>
             </li>
             <li>
-              <Link to="/search?q=Psychological">Psychological</Link>
+              <Link to="/anime/watchlist" onClick={() => switchMode("anime")}>
+                Anime Watchlist
+              </Link>
+            </li>
+            <li className="footer-divider-li"></li>
+            <li>
+              <Link to="/cinema" onClick={() => switchMode("cinema")}>
+                🎬 Cinema Archive
+              </Link>
             </li>
             <li>
-              <Link to="/search?q=Mecha">Mecha</Link>
+              <Link to="/cinema/explore" onClick={() => switchMode("cinema")}>
+                Cinema Catalogue
+              </Link>
             </li>
             <li>
-              <Link to="/search?q=Retro">80s & 90s Classics</Link>
+              <Link to="/cinema/watchlist" onClick={() => switchMode("cinema")}>
+                Cinema Watchlist
+              </Link>
             </li>
           </ul>
         </div>
 
-        {/* Account / Archive Links */}
+        {/* Quick Links & Back to Top */}
         <div className="footer-col-links">
-          <span className="footer-heading font-headline">Navigation</span>
+          <span className="footer-heading font-headline">Curated Cinema</span>
           <ul>
             <li>
-              <Link to="/">Home</Link>
+              <Link to="/cinema/explore?genre=878" onClick={() => switchMode("cinema")}>
+                Sci-Fi
+              </Link>
             </li>
             <li>
-              <Link to="/search">Browse Catalogue</Link>
+              <Link to="/cinema/explore?genre=28" onClick={() => switchMode("cinema")}>
+                Action
+              </Link>
             </li>
             <li>
-              <Link to="/watchlist">My Watchlist</Link>
+              <Link to="/cinema/explore?genre=53" onClick={() => switchMode("cinema")}>
+                Thriller
+              </Link>
+            </li>
+            <li>
+              <Link to="/cinema/explore?genre=18" onClick={() => switchMode("cinema")}>
+                Drama
+              </Link>
+            </li>
+            <li>
+              <Link to="/cinema/explore?genre=27" onClick={() => switchMode("cinema")}>
+                Horror
+              </Link>
             </li>
           </ul>
 
@@ -71,7 +105,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom font-mono">
-        <span>© {new Date().getFullYear()} GEKKAN ANIME. All anime data & artwork via MyAnimeList.</span>
+        <span>© {new Date().getFullYear()} YŪGEN INDEX // 幽玄索引. Dual-Medium Anime & Cinema Platform.</span>
       </div>
     </footer>
   );

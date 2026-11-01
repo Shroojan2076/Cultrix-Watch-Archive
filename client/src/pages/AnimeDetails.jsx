@@ -228,7 +228,7 @@ export default function AnimeDetails() {
     return (
       <main className="details-page-view">
         <div className="details-back-bar">
-          <Link to="/search" className="back-nav-link font-headline">
+          <Link to="/anime/explore" className="back-nav-link font-headline">
             ← Back to Explore
           </Link>
         </div>
@@ -260,7 +260,7 @@ export default function AnimeDetails() {
 
       {/* Top Back Navigation */}
       <div className="details-back-bar">
-        <Link to="/search" className="back-nav-link font-headline">
+        <Link to="/anime/explore" className="back-nav-link font-headline">
           ← Back to Explore
         </Link>
       </div>
@@ -331,7 +331,7 @@ export default function AnimeDetails() {
               {anime.genres.map((g) => (
                 <Link
                   key={g.id || g.name}
-                  to={`/search?q=${encodeURIComponent(g.name)}`}
+                  to={`/anime/explore?q=${encodeURIComponent(g.name)}`}
                   className="genre-tag-link"
                 >
                   {g.name}

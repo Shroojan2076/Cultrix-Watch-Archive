@@ -153,3 +153,165 @@ export async function removeFromWatchlist(malId) {
 
     return data;
 }
+
+/* ==========================================================================
+   Cinema / TMDB API Methods
+   ========================================================================== */
+
+export async function getCinemaTrending(timeWindow = "week", page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/trending?window=${timeWindow}&page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch trending movies");
+    }
+    return data.data;
+}
+
+export async function getCinemaPopular(page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/popular?page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch popular movies");
+    }
+    return data.data;
+}
+
+export async function getCinemaTopRated(page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/top-rated?page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch top-rated movies");
+    }
+    return data.data;
+}
+
+export async function getCinemaUpcoming(page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/upcoming?page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch upcoming movies");
+    }
+    return data.data;
+}
+
+export async function getCinemaNowPlaying(page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/now-playing?page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch now-playing movies");
+    }
+    return data.data;
+}
+
+export async function getCinemaGenres() {
+    const response = await fetch(`${API_URL}/api/cinema/genres`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch movie genres");
+    }
+    return data.data;
+}
+
+export async function discoverMoviesByGenre(genreId, page = 1, sortBy = "popularity.desc") {
+    const response = await fetch(`${API_URL}/api/cinema/discover?genre_id=${genreId}&page=${page}&sort_by=${sortBy}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to discover movies by genre");
+    }
+    return data.data;
+}
+
+export async function searchMovies(query, page = 1) {
+    const response = await fetch(`${API_URL}/api/cinema/search?q=${encodeURIComponent(query)}&page=${page}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to search movies");
+    }
+    return data.data;
+}
+
+export async function getMovieDetails(tmdbId) {
+    const response = await fetch(`${API_URL}/api/cinema/movie/${tmdbId}`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch movie details");
+    }
+    return data.data;
+}
+
+/* ==========================================================================
+   Movie Watchlist API Methods
+   ========================================================================== */
+
+export async function getMovieWatchlist() {
+    const response = await fetch(`${API_URL}/api/cinema/watchlist`, {
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch movie watchlist");
+    }
+    return data.data || [];
+}
+
+export async function addMovieToWatchlist(movieData) {
+    const response = await fetch(`${API_URL}/api/cinema/watchlist/add`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+        },
+        body: JSON.stringify(movieData)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to add movie to watchlist");
+    }
+    return data;
+}
+
+export async function updateMovieWatchlistItem(tmdbId, updates) {
+    const response = await fetch(`${API_URL}/api/cinema/watchlist/${tmdbId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json"
+        },
+        body: JSON.stringify(updates)
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to update movie watchlist item");
+    }
+    return data;
+}
+
+export async function removeMovieFromWatchlist(tmdbId) {
+    const response = await fetch(`${API_URL}/api/cinema/watchlist/${tmdbId}`, {
+        method: "DELETE",
+        headers: { Accept: "application/json" }
+    });
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to remove movie from watchlist");
+    }
+    return data;
+}

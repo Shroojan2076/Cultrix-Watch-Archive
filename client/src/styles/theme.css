@@ -1,20 +1,27 @@
 @import "tailwindcss";
 
 @layer base {
-  :root {
-    /* ==========================================================================
-       GEKKAN ANIME // 月刊アニメ
-       Restrained Editorial Palette: Aged Paper, Carbon Charcoal, Selective Vermilion
-       ========================================================================== */
+  /* ==========================================================================
+     YŪGEN INDEX // 幽玄索引
+     DYNAMIC DUAL-THEME ARCHITECTURE: ANIME MODE vs CINEMA MODE
+     ========================================================================== */
 
-    /* Dark Carbon Backgrounds */
+  /* --------------------------------------------------------------------------
+     1. DEFAULT / ANIME MODE THEME
+     Aesthetic: Tokyo Underground Editorial, Aged Paper, Carbon Black, Vermilion
+     -------------------------------------------------------------------------- */
+  :root,
+  [data-theme="anime"] {
+    /* Carbon Background Scale */
     --color-bg-base: #0E1013;
     --color-bg-subtle: #14171C;
     --color-surface: #181C22;
-    --color-surface-hover: #20252E;
+    --color-surface-hover: #222730;
     --color-surface-sunken: #090B0D;
 
-    /* Natural Paper Surfaces for High-Contrast Editorial Sections */
+    /* High-Contrast Contrast Slab (Aged Paper) */
+    --color-surface-contrast: #F5F2EB;
+    --color-surface-contrast-ink: #121418;
     --color-paper: #F5F2EB;
     --color-paper-light: #FAF8F4;
     --color-paper-dim: #E8E4DA;
@@ -27,27 +34,98 @@
     --color-text-faint: #4B4E58;
 
     /* Selective Accents */
+    --color-accent: #E23826;
+    --color-accent-hover: #FA422F;
+    --color-accent-glow: rgba(226, 56, 38, 0.35);
+    --color-accent-subtle: rgba(226, 56, 38, 0.12);
+    --color-accent-contrast: #FFFFFF;
     --color-vermilion: #E23826;
     --color-vermilion-hover: #FA422F;
     --color-acid: #D8F722;
-    --color-rating-gold: #FFB703;
+    --color-rating: #FFB703;
 
-    /* Subtle Hairline Borders */
+    /* Hairline Borders */
     --color-border: rgba(255, 255, 255, 0.1);
     --color-border-subtle: rgba(255, 255, 255, 0.05);
-    --color-border-strong: rgba(255, 255, 255, 0.2);
+    --color-border-strong: rgba(255, 255, 255, 0.22);
+    --color-border-accent: rgba(226, 56, 38, 0.45);
     --color-border-paper: rgba(18, 20, 24, 0.15);
 
-    /* Font Families */
-    --font-condensed: 'Bebas Neue', -apple-system, sans-serif;
+    /* Typographic Fonts */
     --font-display: 'Syne', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-headline: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-condensed: 'Bebas Neue', -apple-system, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
     --font-mono: 'JetBrains Mono', monospace;
     --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-jp: 'Noto Sans JP', sans-serif;
 
-    /* Layout Constants */
+    /* Atmosphere & Stamps */
+    --stamp-bg: #E23826;
+    --stamp-color: #FFFFFF;
+    --theme-card-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    --theme-glow: 0 0 25px rgba(226, 56, 38, 0.25);
     --content-max-width: 1360px;
+  }
+
+  /* --------------------------------------------------------------------------
+     2. CINEMA MODE THEME
+     Aesthetic: 35mm Cinémathèque, Deep Midnight Obsidian, Film Gold & Amber
+     -------------------------------------------------------------------------- */
+  [data-theme="cinema"] {
+    /* Celluloid Obsidian Background Scale */
+    --color-bg-base: #07090C;
+    --color-bg-subtle: #0B0E14;
+    --color-surface: #10151E;
+    --color-surface-hover: #18202D;
+    --color-surface-sunken: #040507;
+
+    /* Cinematic Slate Contrast Slab */
+    --color-surface-contrast: #121721;
+    --color-surface-contrast-ink: #F7F5F0;
+    --color-paper: #121721;
+    --color-paper-light: #1A212E;
+    --color-paper-dim: #0E131C;
+    --color-paper-ink: #F7F5F0;
+
+    /* Silver & Titanium Ink Scale */
+    --color-text-main: #F7F5F0;
+    --color-text-secondary: #B4B9C4;
+    --color-text-muted: #6B7588;
+    --color-text-faint: #3D4452;
+
+    /* 35mm Gold & Amber Accents */
+    --color-accent: #E5A93C;
+    --color-accent-hover: #F5BE58;
+    --color-accent-glow: rgba(229, 169, 60, 0.35);
+    --color-accent-subtle: rgba(229, 169, 60, 0.14);
+    --color-accent-contrast: #07090C;
+    --color-vermilion: #E5A93C;
+    --color-vermilion-hover: #F5BE58;
+    --color-acid: #E5A93C;
+    --color-rating: #E5A93C;
+
+    /* Warm Metallic Hairline Borders */
+    --color-border: rgba(229, 169, 60, 0.16);
+    --color-border-subtle: rgba(255, 255, 255, 0.05);
+    --color-border-strong: rgba(229, 169, 60, 0.38);
+    --color-border-accent: rgba(229, 169, 60, 0.55);
+    --color-border-paper: rgba(229, 169, 60, 0.2);
+
+    /* Classical Roman Cinematic Serif & Condensed */
+    --font-display: 'Cinzel', 'Playfair Display', Georgia, serif;
+    --font-headline: 'Cinzel', 'Space Grotesk', serif;
+    --font-condensed: 'Bebas Neue', 'Barlow Condensed', sans-serif;
+    --font-serif: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-jp: 'Noto Sans JP', sans-serif;
+
+    /* Atmosphere & Stamps */
+    --stamp-bg: #E5A93C;
+    --stamp-color: #07090C;
+    --theme-card-shadow: 0 8px 24px rgba(0, 0, 0, 0.65), 0 0 1px rgba(229, 169, 60, 0.2);
+    --theme-glow: 0 0 35px rgba(229, 169, 60, 0.2);
   }
 
   html {
@@ -67,13 +145,13 @@
   }
 
   ::selection {
-    background-color: var(--color-vermilion);
-    color: #FFFFFF;
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
   }
 }
 
 /* ==========================================================================
-   Typography & Stamp Utilities
+   Typography & Utility Classes
    ========================================================================== */
 .font-condensed {
   font-family: var(--font-condensed);
@@ -88,6 +166,10 @@
   font-family: var(--font-headline);
 }
 
+.font-serif {
+  font-family: var(--font-serif);
+}
+
 .font-mono {
   font-family: var(--font-mono);
 }
@@ -96,25 +178,27 @@
   font-family: var(--font-jp);
 }
 
-/* Subtle Japanese Brand Stamp */
+/* Dynamic Brand Stamp */
 .jp-brand-mark {
   font-family: var(--font-jp);
   font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 1px 6px;
-  background-color: var(--color-vermilion);
-  color: #FFFFFF;
+  padding: 1px 7px;
+  background-color: var(--stamp-bg);
+  color: var(--stamp-color);
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.2;
+  border-radius: 2px;
+  transition: all 400ms ease;
 }
 
 /* Paper Contrast Slab */
 .paper-slab {
-  background-color: var(--color-paper);
-  color: var(--color-paper-ink);
+  background-color: var(--color-surface-contrast);
+  color: var(--color-surface-contrast-ink);
   border: 1px solid var(--color-border-paper);
 }
 
@@ -124,7 +208,55 @@
   border: 1px solid var(--color-border);
 }
 
-/* Clean Scrollbars */
+/* Dynamic Theme Transitions (350–500ms) */
+html,
+body,
+.site-header,
+.site-footer,
+.masthead-container,
+.medium-switcher,
+.medium-tab,
+.desktop-nav .nav-item,
+.header-search-form,
+.spotlight-section,
+.cinema-hero-spread,
+.paper-contrast-section,
+.paper-slab,
+.anime-card,
+.movie-card,
+.film-card,
+.film-row-card,
+.film-archive-entry-card,
+.details-hero,
+.details-sidebar,
+.watchlist-heading-panel,
+.watchlist-tab-pill,
+.film-archive-masthead,
+.film-archive-ledger-btn,
+.search-hero-bar,
+.theme-pill,
+.genre-filter-pill,
+.btn-spotlight-primary,
+.btn-spotlight-secondary,
+.btn-primary-action,
+.btn-secondary-action {
+  transition:
+    background-color 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    color 400ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Clean Dynamic Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -135,10 +267,10 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #252830;
+  background: var(--color-surface-hover);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-vermilion);
+  background: var(--color-accent);
 }

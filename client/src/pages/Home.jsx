@@ -188,7 +188,7 @@ export default function Home() {
                   View Details →
                 </Link>
                 <Link
-                  to="/search"
+                  to="/anime/explore"
                   className="btn-secondary-action font-headline"
                 >
                   Explore Catalogue
@@ -208,7 +208,7 @@ export default function Home() {
           <div className="paper-section-inner">
             <div className="section-title-row">
               <h2 className="section-title-condensed font-condensed">POPULAR ANIME</h2>
-              <Link to="/search?q=Popular" className="section-view-all font-headline">
+              <Link to="/anime/explore?q=Popular" className="section-view-all font-headline">
                 View All →
               </Link>
             </div>
@@ -292,7 +292,7 @@ export default function Home() {
         <div className="about-strip-content">
           <div className="about-brand-tag">
             <span className="jp-brand-mark">月刊</span>
-            <span className="font-condensed about-brand-title">GEKKAN ANIME</span>
+            <span className="font-condensed about-brand-title">YŪGEN INDEX</span>
           </div>
           <p className="about-tagline">
             An independent anime catalogue and personal watchlist. Built for enthusiasts who care about
