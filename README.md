@@ -1,119 +1,135 @@
-# MyAnimeSite - Full Stack Anime Discovery & Watchlist Tracker
+# CULTRIX // CULTURE + MATRIX
+### Dual-Medium Visual Culture Discovery Platform (Anime + Cinema)
 
 ```text
-  ___  ___       ___         _                  _____ _ _       
-  |  \/  |      / _ \       (_)                /  ___(_) |      
-  | .  . |_   _/ /_\ \ _ __  _ _ __ ___   ___  \ `--. _| |_ ___ 
-  | |\/| | | | |  _  || '_ \| | '_ ` _ \ / _ \  `--. \ | __/ _ \
-  | |  | | |_| | | | || | | | | | | | | |  __/ /\__/ / | ||  __/
-  \_|  |_/\__, \_| |_/|_| |_|_|_| |_| |_|\___| \____/|_|\__\___|
-           __/ |                                                
-          |___/                                                 
+   ██████╗██╗   ██╗██╗  ████████╗██████╗ ██╗██╗  ██╗
+  ██╔════╝██║   ██║██║  ╚══██╔══╝██╔══██╗██║╚██╗██╔╝
+  ██║     ██║   ██║██║     ██║   ██████╔╝██║ ╚███╔╝ 
+  ██║     ██║   ██║██║     ██║   ██╔══██╗██║ ██╔██╗ 
+  ╚██████╗╚██████╔╝███████╗██║   ██║  ██║██║██╔╝ ██╗
+   ╚═════╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝
 ```
 
-> **Live Deployment Links:**
-> * **Frontend (Vercel):** [https://anime-website-client-alpha.vercel.app/](https://anime-website-client-alpha.vercel.app/)
-> * **Backend API (Render):** [https://anime-website-server-kji1.onrender.com](https://anime-website-server-kji1.onrender.com)
-> * **Database:** Serverless PostgreSQL on Neon.tech
+> **Culture Has No Boundaries.**  
+> An independent discovery platform and personal registry for visual culture across **Animation** and **Cinema**.
 
 ---
 
 ## Overview
 
-Hey! This is a full-stack web application I built to discover anime, explore detailed metadata, and maintain a personalized tracking watchlist with real-time episode counts and scores.
+**CULTRIX** (derived from **CULTURE + MATRIX**) is a decoupled, full-stack visual culture platform that brings together two distinct artistic mediums under one brand identity:
 
-Instead of hardcoding dummy data or over-complicating things with massive enterprise frameworks, I wanted to build a clean, textbook decoupled application from scratch:
-* A modern **React Single Page Application (SPA)** on the frontend with custom Vanilla CSS.
-* A lightweight, stateless **Node.js + Express REST API** in the middle.
-* A live **PostgreSQL** database on the backend storing user watchlist records.
-* Integration with the public **MyAnimeList (MAL) API v2** for live search and metadata.
+1. **ANIME MODE**: An expressive Tokyo underground publication aesthetic powered by the official **MyAnimeList API v2**.
+2. **CINEMA MODE**: A 35mm cinémathèque aesthetic powered by **The Movie Database (TMDB) API**.
+
+Both mediums share the **CULTRIX** brand shell, unified navigation, and mode switcher, while maintaining strictly separated content catalogues, discovery patterns, details architectures, watchlists, and database storage.
+
+---
+
+## Dynamic Dual-Medium Brand & Visual Identity
+
+CULTRIX features a dynamic dual-environment theme engine that transforms the interface when toggling between Anime and Cinema:
+
+| Aspect | Anime Mode | Cinema Mode |
+| :--- | :--- | :--- |
+| **Aesthetic Direction** | Tokyo underground editorial, aged paper, carbon black | 35mm cinémathèque, celluloid obsidian, titanium |
+| **Signature Accent** | **Vermilion** (`#E23826`) | **Film Gold & Amber** (`#E5A93C`) |
+| **Typography System** | `Syne` (Display) + `Space Grotesk` (Headlines) | `Cinzel` (Classical Roman Serif) + `Space Grotesk` |
+| **Matrix X Logo** | Sharp graphic print matrix with diagonal velocity | 35mm celluloid film strip with sprocket perforations & projector aperture |
+| **Wordmark Accenting** | `CULTRI`<span style="color:#E23826">`X`</span> in Vermilion | `CULTRI`<span style="color:#E5A93C">`X`</span> in Film Gold |
+| **Browser Favicon** | Dynamic `/favicon.svg` (Print Matrix) | Dynamic `/favicon-cinema.svg` (35mm Celluloid) |
+| **Content Engine** | MyAnimeList API v2 (Japanese Animation) | The Movie Database TMDB API (Global Cinema) |
 
 ---
 
 ## Key Features
 
-### [1] Discovery & Search
-* **Unified Navbar Search:** Clean search input right in the top navigation bar with instant query parameter routing (`/search?q=...`). No duplicate search bars cluttering the pages.
-* **Explore Page with Dynamic Sorting:** Search results can be sorted on the fly by:
-  * `Relevance` (default MAL algorithm)
-  * `Title (A - Z)` (alphabetical order)
-  * `Rating (High to Low)` (MAL community score)
-  * `Episodes (Most)` (total episode count)
-* **Genre Pills & Trending Highlights:** One-click shortcuts for popular genres (Action, Shounen, Supernatural, Sci-Fi, Fantasy, Romance) and quick trending searches.
-* **Infinite/Paging Support:** Next-page fetching straight from the MAL API stream.
+### 1. Unified Application Shell & Mode Switcher
+* **One-Click Mode Switcher:** Instantly toggle between `ANIME` and `CINEMA` with context-preserving route transitions (`/anime/*` $\leftrightarrow$ `/cinema/*`).
+* **Backward-Compatible Persistence:** Preserves user mode in `localStorage` under `cultrix_mode` (with fallback to legacy preferences).
+* **Responsive Navigation:** Clean desktop navigation bar and mobile drawer with quick access to Home, Explore, and Watchlists.
 
-### [2] Personal Library & Watchlist
-* **Full CRUD Operations:** Add anime, update viewing status, adjust personal ratings, increment watched episodes, and delete entries.
-* **Status Tab Filtering:** Easily switch between `All`, `Watching`, `Completed`, `Plan to Watch`, `On Hold`, and `Dropped`.
-* **Quick Progress Tracker:** One-click `+1 ep` increment button right on each watchlist card without having to open edit modals.
-* **Watchlist Sorting:** Sort your saved library by `Recently Updated`, `Rating`, `Title (A - Z)`, or `Episodes Watched`.
-* **Database Fallback:** If the external MAL API ever has downtime or rate-limits, details pages fall back to metadata already saved in PostgreSQL.
+### 2. Anime Experience (Tokyo Underground)
+* **English-First Title Resolution:** Intelligently prioritizes English titles (`alternative_titles.en`), falling back gracefully to canonical titles.
+* **Monumental Spotlight Hero:** Showcases seasonal flagship series with backdrop art, Japanese typographic mark, synopsis, and instant watchlist CTA.
+* **High-Contrast Paper Slab:** Curated selections presented on aged paper contrast slabs with bespoke typography.
+* **Explore & Search:** Filter by curated themes (Cyberpunk, Psychological, Retro, Mecha, Dark Fantasy, Seinen), toggle between 2:3 poster grid and list rows.
+* **4-Section Details Architecture:** Hero banner, interactive watchlist action deck, full synopsis, and technical specifications.
+* **Episode Watchlist:** Tracks viewing status (`Watching`, `Completed`, `Plan to Watch`, `On Hold`, `Dropped`), with one-click `+1 ep` progress increments and personal 1–10 ratings.
+
+### 3. Cinema Experience (35mm Cinémathèque)
+* **Widescreen 16:9 Hero:** Dynamic backdrop presentation of trending canonical films with director/runtime specs.
+* **Weekly Trending Stills:** 16:9 cinematic still cards with celluloid vignetting and TMDB community scores.
+* **Genre Discovery:** Instant filtering across Sci-Fi, Action, Thriller, Drama, Horror, Crime, and Animation.
+* **Film Dossier Details:** Backdrop imagery, cast & crew credits, trailers/videos, release dates, and runtime specifications.
+* **Cinémathèque Personal Archive Watchlist:**
+  * Widescreen landscape still frames with atmospheric celluloid vignettes.
+  * Archival ledger statuses: `● SCREENED` (Amber glow) vs. `○ QUEUED` (Silver).
+  * Metadata hierarchy: Classification, Release Year, Runtime in minutes, Genres, and TMDB Community Rating.
+  * Interactive controls: Instant status toggle (`✓ Screened`), personal 1–10 star rating selector, direct dossier link, and deletion.
 
 ---
 
 ## Architecture & Data Flow
 
 ```text
-+-------------------------------------------------------------+
-|                     Client (React 19 + Vite)                |
-|  - React Router 7 (SPA navigation & rewrites via vercel.json) |
-|  - Vanilla CSS theme system (dark mode, glassmorphism)      |
-|  - State management via useState, useEffect, useMemo        |
-+------------------------------+------------------------------+
-                               |
-                   HTTP / JSON | (REST API via fetch)
-                               v
-+-------------------------------------------------------------+
-|                  Server (Express 5 on Node.js)              |
-|  - Stateless REST endpoints (/search, /anime/:id, /watchlist)|
-|  - Permissive CORS handling for production domains          |
-|  - Native node fetch client for external MAL requests       |
-+----------------+-----------------------------+--------------+
-                 |                             |
-     SQL Queries | (node-pg pool)   REST Calls | (X-MAL-CLIENT-ID)
-                 v                             v
-+--------------------------------+  +-------------------------+
-|     PostgreSQL (Neon Cloud)    |  |     MyAnimeList API     |
-|  - anime (cached metadata)     |  |  - api.myanimelist.net  |
-|  - watchlist (user tracking)   |  |  - Real-time catalog    |
-+--------------------------------+  +-------------------------+
++--------------------------------------------------------------------------+
+|                       CULTRIX Client (React 19 + Vite)                   |
+|  - ModeContext: dynamic theme switcher (anime / cinema), localStorage    |
+|  - Dynamic CULTRIX X Symbol: morphs vector geometry & colors per mode    |
+|  - Pure Vanilla CSS Design Tokens (theme.css + style.css)                |
+|  - React Router 7: dedicated /anime/* and /cinema/* route namespaces     |
++------------------------------------+-------------------------------------+
+                                     |
+                         HTTP / JSON | (REST API via fetch)
+                                     v
++--------------------------------------------------------------------------+
+|                       Server (Node.js + Express 5)                       |
+|  - Constrained project CORS allowlist (strict preview regex security)   |
+|  - In-memory TTL caching for third-party API rate-limit resilience       |
+|  - Dedicated route modules: /search, /anime, /watchlist, /api/cinema/*   |
++------------------+------------------------------------+------------------+
+                   |                                    |
+       SQL Queries | (node-pg pool)         HTTP / REST | (API Key / Client ID)
+                   v                                    v
++--------------------------------------+   +-------------------------------+
+|      PostgreSQL (Neon Cloud DB)      |   |        External APIs          |
+|  - anime (cached MAL metadata)       |   |  - MyAnimeList API v2         |
+|  - watchlist (anime episode tracking)|   |  - The Movie Database (TMDB)  |
+|  - movie_watchlist (film archive)    |   +-------------------------------+
++--------------------------------------+
 ```
 
 ---
 
-##  Tech Stack
+## Tech Stack
 
 ### Frontend (`/client`)
-* **Core:** React 19, JavaScript (ESModules)
-* **Tooling & Bundler:** Vite 8
-* **Routing:** React Router DOM v7
-* **Styling:** 100% Vanilla CSS (`theme.css` + `style.css`)
-  * Custom dark palette with HSL-tailored accents
-  * Responsive layout using CSS Grid & Flexbox
-  * Zero bulky CSS frameworks (no Tailwind or Bootstrap bloat)
-* **Hosting:** Vercel
+* **Framework:** React 19, JavaScript (ESModules)
+* **Build Tool:** Vite 8 (production bundle builds in ~200ms)
+* **Routing:** React Router DOM v7 (with `vercel.json` SPA rewrite rules)
+* **Styling:** Modular Vanilla CSS & CSS Custom Properties (`theme.css` + `style.css`)
+  * Dynamic theme tokens (`[data-theme="anime"]` vs. `[data-theme="cinema"]`)
+  * Typography: `Space Grotesk`, `Syne`, `Cinzel`, `Cormorant Garamond`, `JetBrains Mono`, `Bebas Neue`
+  * Fully decoupled component classes: `.film-card`, `.film-row-card`, `.film-archive-*` vs. `.anime-card`, `.anime-row-card`, `.watchlist-*`
 
 ### Backend (`/server`)
 * **Runtime:** Node.js (v20+)
 * **Framework:** Express 5
-* **Database Driver:** `pg` (node-postgres connection pool)
-* **Cross-Origin Handling:** `cors`
-* **Configuration:** `dotenv`
-* **Hosting:** Render
+* **Security:** Hardened CORS policy with strict project-level Vercel preview regex validation
+* **Database Driver:** `pg` (node-postgres connection pool with SSL handling)
+* **External Clients:** Native `fetch` with in-memory caching for TMDB and MAL APIs
 
-### Database
-* **Engine:** PostgreSQL 16
-* **Provider:** Neon.tech (Serverless Cloud Postgres)
-* **Schema Initialization:** Automated boot check (`CREATE TABLE IF NOT EXISTS`)
+### Database (Neon PostgreSQL)
+* **Provider:** Serverless PostgreSQL on Neon.tech
+* **Isolation:** Strict separation between Anime tables and Cinema tables. Zero cross-medium data interference.
 
 ---
 
-##  Database Schema
-
-The database consists of two straightforward relational tables linked by a foreign key constraint:
+## Database Schema
 
 ```sql
--- Cached anime metadata
+-- 1. Anime Metadata Cache
 CREATE TABLE IF NOT EXISTS anime (
     id SERIAL PRIMARY KEY,
     mal_id INT NOT NULL UNIQUE,
@@ -128,7 +144,7 @@ CREATE TABLE IF NOT EXISTS anime (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- User tracking details
+-- 2. Anime User Watchlist
 CREATE TABLE IF NOT EXISTS watchlist (
     id SERIAL PRIMARY KEY,
     anime_id INT NOT NULL UNIQUE REFERENCES anime(id) ON DELETE CASCADE,
@@ -140,38 +156,67 @@ CREATE TABLE IF NOT EXISTS watchlist (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- 3. Dedicated Cinema Archive Watchlist
+CREATE TABLE IF NOT EXISTS movie_watchlist (
+    id SERIAL PRIMARY KEY,
+    tmdb_id INT NOT NULL UNIQUE,
+    title VARCHAR(500) NOT NULL,
+    original_title VARCHAR(500),
+    poster_path TEXT,
+    backdrop_path TEXT,
+    release_date VARCHAR(50),
+    runtime INT,
+    status VARCHAR(50) DEFAULT 'want_to_watch' NOT NULL,
+    score NUMERIC(3, 1),
+    overview TEXT,
+    genres TEXT[],
+    vote_average NUMERIC(3, 1),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ---
 
 ## API Endpoints Reference
 
-### Anime & Search
+### Anime Endpoints (MyAnimeList Integration)
 | Method | Endpoint | Query / Body Params | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/` | `?q=<term>` | Search anime catalog via query string |
-| `POST` | `/` | `{ "query": "<term>" }` | Search anime catalog via request body |
-| `GET` | `/next` | `?url=<mal_paging_url>` | Fetches next pagination batch from MAL |
-| `GET` | `/anime/:mal_id` | Path param `:mal_id` | Returns full anime details + watchlist status |
-
-### Watchlist Management
-| Method | Endpoint | Request Body | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/watchlist` | None | Returns all anime saved in user's watchlist |
-| `POST` | `/watchlist/add` | `{ mal_id, title, poster, media_type, ... }` | Inserts anime and adds entry to watchlist |
+| `POST` | `/` | `{ "query": "<term>" }` | Search anime catalog via MAL API |
+| `GET` | `/ranking` | `?type=all&limit=10` | Top/airing/popular anime ranking |
+| `GET` | `/next` | `?url=<mal_url>` | Fetches next page of MAL results |
+| `GET` | `/anime/:mal_id` | `:mal_id` | Returns complete anime details + watchlist status |
+| `GET` | `/watchlist` | None | Retrieves all saved anime entries |
+| `POST` | `/watchlist/add` | `{ mal_id, title, poster, ... }` | Adds anime to watchlist |
 | `PUT` | `/watchlist/:mal_id` | `{ status, episodes_watched, score }` | Updates progress, rating, or watch status |
-| `DELETE` | `/watchlist/:mal_id` | None | Removes the specified anime from watchlist |
+| `DELETE` | `/watchlist/:mal_id`| None | Removes anime from watchlist |
+
+### Cinema Endpoints (TMDB Integration)
+| Method | Endpoint | Query / Body Params | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/cinema/trending` | `?time_window=week&page=1` | Weekly trending cinema |
+| `GET` | `/api/cinema/popular` | `?page=1` | Currently popular feature films |
+| `GET` | `/api/cinema/top-rated` | `?page=1` | Canonical all-time top rated masterworks |
+| `GET` | `/api/cinema/genres` | None | Curated TMDB film genres |
+| `GET` | `/api/cinema/discover` | `?genre_id=<id>&sort_by=<sort>&page=1` | Explores films by genre and sorting index |
+| `GET` | `/api/cinema/search` | `?q=<term>&page=1` | Searches TMDB movie database |
+| `GET` | `/api/cinema/movie/:id`| `:id` | Full film dossier: cast, crew, videos, specs |
+| `GET` | `/api/cinema/watchlist`| None | Retrieves personal cinémathèque film registry |
+| `POST` | `/api/cinema/watchlist/add` | `{ tmdb_id, title, status, ... }` | Registers film in personal archive |
+| `PUT` | `/api/cinema/watchlist/:id` | `{ status, score }` | Updates screening status or personal rating |
+| `DELETE`| `/api/cinema/watchlist/:id`| None | Removes film from personal archive |
 
 ---
 
 ## Local Setup & Installation
 
-If you want to run this project on your own machine, follow these steps:
-
 ### Prerequisites
 * **Node.js** (v18.0.0 or higher)
 * **PostgreSQL** (running locally on port 5432, or a free [Neon](https://neon.tech) connection string)
-* **Git**
+* **TMDB API Key** (v3 auth from [themoviedb.org](https://www.themoviedb.org/settings/api))
+* **MyAnimeList Client ID** (from [myanimelist.net/apiconfig](https://myanimelist.net/apiconfig))
 
 ### 1. Clone the repository
 ```bash
@@ -180,73 +225,65 @@ cd anime-website
 ```
 
 ### 2. Configure & Run Backend (`/server`)
-1. Move into the server folder and install dependencies:
-   ```bash
-   cd server
-   npm install
-   ```
+```bash
+cd server
+npm install
+```
 
-2. Create a `.env` file in the `server/` directory:
-   ```env
-   PORT=3000
-   
-   # Option A: Cloud database URL (Neon, Supabase, etc.)
-   DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+Create a `.env` file in `server/`:
+```env
+PORT=3000
 
-   # Option B: Local Postgres fallback
-   PG_HOST=localhost
-   PG_PORT=5432
-   PG_USER=postgres
-   PG_PASSWORD=your_postgres_password
-   PG_DATABASE=myanimesite
+# PostgreSQL Connection String (Neon Cloud or Local)
+DATABASE_URL=postgresql://user:password@host/database?sslmode=require
 
-   # MAL API Public Client ID
-   MAL_CLIENT_ID=6dc871f8d1aa947c33800a696f65fc52
-   MAL_CLIENT_SECRET=38962dcc76ffe79069519ec0b89765be0d7485daaa5155d953010e4604ada980
+# External API Keys
+MAL_CLIENT_ID=your_mal_client_id
+MAL_CLIENT_SECRET=your_mal_client_secret
+TMDB_API_KEY=your_tmdb_api_key
 
-   # Client origin allowed by CORS
-   CLIENT_URL=http://localhost:5173
-   ```
+# CORS Allowed Origins (Comma-separated in production)
+CLIENT_URL=http://localhost:5173
+```
 
-3. Start the server:
-   ```bash
-   npm run dev
-   # or
-   npm start
-   ```
-   The backend will start at `http://localhost:3000` and automatically create the required database tables.
+Start the backend server:
+```bash
+npm run dev
+# or
+npm start
+```
+The server will start at `http://localhost:3000` and automatically verify database tables.
 
 ### 3. Configure & Run Frontend (`/client`)
-1. Open a new terminal, navigate into `client/`, and install dependencies:
-   ```bash
-   cd client
-   npm install
-   ```
+Open a new terminal:
+```bash
+cd client
+npm install
+```
 
-2. (Optional) Create a `.env` file in `client/` if your backend is running on a port other than 3000:
-   ```env
-   VITE_API_URL=http://localhost:3000
-   ```
+(Optional) Create a `.env` file in `client/`:
+```env
+VITE_API_URL=http://localhost:3000
+```
 
-3. Start the Vite development server:
-   ```bash
-   npm run dev
-   ```
-4. Open `http://localhost:5173` in your browser.
+Start the Vite development server:
+```bash
+npm run dev
+```
 
----
-
-## What I Learned While Building This
-
-* **Client vs. Server Separation:** Early on, the backend was handling UI rendering and session redirects with EJS. Decoupling the server into a clean JSON REST API and letting React manage the client state made the architecture much more flexible and easy to deploy.
-* **Why Bundling Matters:** Seeing how Vite processes JSX into a single minified JavaScript bundle and uses content hashing (cache busting) in `/dist` made production builds much clearer.
-* **Handling Cloud Postgres SSL:** Learning that managed cloud providers like Neon require SSL configurations (`ssl: { rejectUnauthorized: false }`) while local setups do not.
-* **SPA Routing on Vercel:** Discovering why client-side React routes 404 on refresh in production without a `vercel.json` rewrite rule to redirect incoming traffic back to `/index.html`.
-* **Zero Bloat Aesthetics:** You do not need massive 50MB CSS frameworks to make a website look modern. Plain CSS variables, clean flex layouts, and thoughtful typography can achieve a great look while keeping load times under 150ms.
+Open `http://localhost:5173` in your browser.
 
 ---
 
-##  Author
+## Quality Assurance & Verification
+
+* **ESLint:** Run `npm --prefix client run lint` (0 errors, 0 warnings).
+* **Production Build:** Run `npm --prefix client run build` (builds cleanly in ~200ms).
+* **CORS Security:** Tested against allowed origins and unauthorized origins (`403 Forbidden`).
+
+---
+
+## Author & License
 
 * **Created by:** Shroojan Dhok
 * **GitHub:** [@Shroojan2076](https://github.com/Shroojan2076)
