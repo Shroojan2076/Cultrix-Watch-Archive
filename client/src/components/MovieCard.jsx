@@ -8,7 +8,7 @@ export default function MovieCard({
   if (!movie) return null;
 
   const isTv = movie.media_type === "tv" || (!movie.title && !!movie.name);
-  const typeLabel = isTv ? "TV SERIES" : "FILM";
+  const typeLabel = isTv ? "SERIES" : "FILM";
   const title = movie.title || movie.name || movie.original_title || movie.original_name || "Untitled";
   const posterUrl = movie.poster_path
     ? (movie.poster_path.startsWith("http")
@@ -151,7 +151,7 @@ export default function MovieCard({
             </div>
           )}
 
-          <div className={`film-format-badge font-mono ${isTv ? "badge-tv-series" : ""}`}>
+          <div className="film-format-badge font-mono">
             {typeLabel}
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function MovieCard({
         {/* Disciplined Details: Aligned rows */}
         <div className="film-card-details">
           <div className="film-card-subline font-mono">
-            <span className={isTv ? "subline-tv font-bold" : "subline-film"}>{typeLabel}</span>
+            <span>{typeLabel}</span>
             {year && <span>• {year}</span>}
           </div>
 

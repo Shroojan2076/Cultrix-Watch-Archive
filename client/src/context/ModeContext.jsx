@@ -45,10 +45,9 @@ export function ModeProvider({ children }) {
 
       // Context-sensitive path transition
       const currentPath = location.pathname;
-      const search = location.search;
       if (newMode === "cinema") {
         if (currentPath.includes("/explore") || currentPath.includes("/search")) {
-          navigate(`/cinema/explore${search}`);
+          navigate("/cinema/explore");
         } else if (currentPath.includes("/watchlist")) {
           navigate("/cinema/watchlist");
         } else {
@@ -56,7 +55,7 @@ export function ModeProvider({ children }) {
         }
       } else {
         if (currentPath.includes("/explore") || currentPath.includes("/search")) {
-          navigate(`/anime/explore${search}`);
+          navigate("/anime/explore");
         } else if (currentPath.includes("/watchlist")) {
           navigate("/anime/watchlist");
         } else {
@@ -64,7 +63,7 @@ export function ModeProvider({ children }) {
         }
       }
     },
-    [mode, location.pathname, location.search, navigate]
+    [mode, location.pathname, navigate]
   );
 
   const isAnime = mode === "anime";

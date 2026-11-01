@@ -2773,19 +2773,6 @@ button, input, select {
   line-height: 1;
 }
 
-.film-format-badge.badge-tv-series {
-  background-color: rgba(220, 38, 38, 0.88);
-  color: #ffffff;
-  border-color: rgba(255, 255, 255, 0.3);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.subline-tv {
-  color: #ef4444;
-  font-weight: 700;
-}
-
 .film-card-details {
   padding: 12px 14px 14px;
   display: flex;
