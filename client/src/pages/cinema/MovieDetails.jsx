@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import MovieCard from "../../components/MovieCard";
 import {
   getMovieDetails,
@@ -27,6 +27,9 @@ function formatCurrency(amount) {
 
 export default function MovieDetails() {
   const { tmdb_id } = useParams();
+  const [searchParams] = useSearchParams();
+  const mediaType = searchParams.get("type");
+
   const [movie, setMovie] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,7 +44,7 @@ export default function MovieDetails() {
       try {
         setLoading(true);
         setError(null);
-        const data = await getMovieDetails(tmdb_id);
+        const data = await getMovieDetails(tmdb_id, mediaType);
         if (isMounted) {
           setMovie(data);
           if (data.trailers && data.trailers.length > 0) {
@@ -50,7 +53,7 @@ export default function MovieDetails() {
         }
       } catch (err) {
         if (isMounted) {
-          setError(err.message || "Failed to load movie details.");
+          setError(err.message || "Failed to load cinema details.");
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -62,7 +65,10 @@ export default function MovieDetails() {
     return () => {
       isMounted = false;
     };
-  }, [tmdb_id]);
+  }, [tmdb_id, mediaType]);
+
+  const isTv = movie ? (movie.media_type === "tv" || Boolean(movie.number_of_seasons)) : false;
+  const typeLabel = isTv ? "TV SERIES" : "FILM";
 
   async function handleAddWatchlist() {
     if (!movie) return;
@@ -70,17 +76,18 @@ export default function MovieDetails() {
       setSaving(true);
       await addMovieToWatchlist({
         tmdb_id: movie.id,
-        title: movie.title,
-        original_title: movie.original_title,
+        title: movie.title || movie.name,
+        original_title: movie.original_title || movie.original_name,
         poster_path: movie.poster_path,
         backdrop_path: movie.backdrop_path,
-        release_date: movie.release_date,
+        release_date: movie.release_date || movie.first_air_date,
         runtime: movie.runtime,
         status: "want_to_watch",
         score: null,
         overview: movie.overview,
         genres: movie.genres || [],
-        vote_average: movie.vote_average
+        vote_average: movie.vote_average,
+        media_type: isTv ? "tv" : "movie"
       });
 
       setMovie(prev => ({
@@ -138,7 +145,8 @@ export default function MovieDetails() {
 
   async function handleRemoveWatchlist() {
     if (!movie) return;
-    if (!window.confirm(`Remove "${movie.title}" from your Cinema Watchlist?`)) return;
+    const displayName = movie.title || movie.name;
+    if (!window.confirm(`Remove "${displayName}" from your Cinema Watchlist?`)) return;
     try {
       setSaving(true);
       await removeMovieFromWatchlist(movie.id);
@@ -171,7 +179,7 @@ export default function MovieDetails() {
     return (
       <main className="details-container">
         <div className="search-error font-mono">
-          <span>{error || "Movie not found"}</span>
+          <span>{error || "Title not found"}</span>
           <Link to="/cinema/explore" className="btn-spotlight-secondary font-headline" style={{ marginTop: "1rem" }}>
             Return to Cinema Explore
           </Link>
@@ -186,8 +194,10 @@ export default function MovieDetails() {
   const backdropUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`
     : null;
-  const releaseYear = movie.release_date ? movie.release_date.slice(0, 4) : null;
+  const releaseYear = (movie.release_date || movie.first_air_date || "").slice(0, 4) || null;
   const runtimeFormatted = formatRuntime(movie.runtime);
+  const displayTitle = movie.title || movie.name || "Untitled";
+  const displayOriginalTitle = movie.original_title || movie.original_name;
 
   return (
     <main className="details-container movie-details-page">
@@ -222,7 +232,7 @@ export default function MovieDetails() {
             {posterUrl ? (
               <img
                 src={posterUrl}
-                alt={movie.title}
+                alt={displayTitle}
                 className="details-poster-img"
               />
             ) : (
@@ -240,20 +250,26 @@ export default function MovieDetails() {
           {/* Details & Specs Column */}
           <div className="details-header-info">
             <div className="details-meta-pill-row font-mono">
-              <span className="details-type-pill">FILM</span>
+              <span className="details-type-pill">{typeLabel}</span>
               {releaseYear && <span>{releaseYear}</span>}
-              {runtimeFormatted && <span>{runtimeFormatted}</span>}
+              {isTv && movie.number_of_seasons && (
+                <span>{movie.number_of_seasons} Season{movie.number_of_seasons > 1 ? "s" : ""}</span>
+              )}
+              {isTv && movie.number_of_episodes && (
+                <span>{movie.number_of_episodes} Episodes</span>
+              )}
+              {!isTv && runtimeFormatted && <span>{runtimeFormatted}</span>}
               {movie.original_language && (
                 <span>{movie.original_language.toUpperCase()}</span>
               )}
               {movie.status && <span>{movie.status.toUpperCase()}</span>}
             </div>
 
-            <h1 className="details-title font-display">{movie.title}</h1>
+            <h1 className="details-title font-display">{displayTitle}</h1>
 
-            {movie.original_title && movie.original_title !== movie.title && (
+            {displayOriginalTitle && displayOriginalTitle !== displayTitle && (
               <p className="movie-original-title font-mono">
-                ORIGINAL: {movie.original_title}
+                ORIGINAL: {displayOriginalTitle}
               </p>
             )}
 
@@ -265,7 +281,8 @@ export default function MovieDetails() {
 
             {movie.director && (
               <p className="movie-director-label font-mono">
-                DIRECTED BY <strong className="movie-director-name font-headline">{movie.director.name}</strong>
+                {movie.director.job === "Creator" ? "CREATED BY" : "DIRECTED BY"}{" "}
+                <strong className="movie-director-name font-headline">{movie.director.name}</strong>
               </p>
             )}
 
@@ -293,7 +310,7 @@ export default function MovieDetails() {
                   onClick={handleAddWatchlist}
                   disabled={saving}
                 >
-                  {saving ? "Saving..." : "+ Add to Cinema Watchlist"}
+                  {saving ? "Saving..." : `+ Add to Cinema Watchlist`}
                 </button>
               ) : (
                 <div className="watchlist-active-panel">
@@ -442,37 +459,50 @@ export default function MovieDetails() {
             <h3 className="sidebar-group-title font-headline">Specifications</h3>
 
             <div className="spec-row">
-              <span className="spec-label">Director:</span>
+              <span className="spec-label">{isTv ? "Creator / Lead:" : "Director:"}</span>
               <span className="spec-value">
-                {movie.director ? movie.director.name : "N/A"}
+                {movie.director ? movie.director.name : (movie.created_by?.[0]?.name || "N/A")}
               </span>
             </div>
 
             <div className="spec-row">
-              <span className="spec-label">Release Date:</span>
-              <span className="spec-value">{movie.release_date || "N/A"}</span>
+              <span className="spec-label">{isTv ? "First Air Date:" : "Release Date:"}</span>
+              <span className="spec-value">{movie.release_date || movie.first_air_date || "N/A"}</span>
             </div>
 
-            <div className="spec-row">
-              <span className="spec-label">Runtime:</span>
-              <span className="spec-value">{runtimeFormatted || "N/A"}</span>
-            </div>
+            {isTv ? (
+              <>
+                <div className="spec-row">
+                  <span className="spec-label">Seasons:</span>
+                  <span className="spec-value">{movie.number_of_seasons || "N/A"}</span>
+                </div>
+                <div className="spec-row">
+                  <span className="spec-label">Episodes:</span>
+                  <span className="spec-value">{movie.number_of_episodes || "N/A"}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="spec-row">
+                  <span className="spec-label">Runtime:</span>
+                  <span className="spec-value">{runtimeFormatted || "N/A"}</span>
+                </div>
+                <div className="spec-row">
+                  <span className="spec-label">Budget:</span>
+                  <span className="spec-value">{formatCurrency(movie.budget)}</span>
+                </div>
+                <div className="spec-row">
+                  <span className="spec-label">Revenue:</span>
+                  <span className="spec-value">{formatCurrency(movie.revenue)}</span>
+                </div>
+              </>
+            )}
 
             <div className="spec-row">
               <span className="spec-label">Original Language:</span>
               <span className="spec-value">
                 {movie.original_language ? movie.original_language.toUpperCase() : "N/A"}
               </span>
-            </div>
-
-            <div className="spec-row">
-              <span className="spec-label">Budget:</span>
-              <span className="spec-value">{formatCurrency(movie.budget)}</span>
-            </div>
-
-            <div className="spec-row">
-              <span className="spec-label">Revenue:</span>
-              <span className="spec-value">{formatCurrency(movie.revenue)}</span>
             </div>
 
             {movie.production_companies && movie.production_companies.length > 0 && (
@@ -488,7 +518,7 @@ export default function MovieDetails() {
       </section>
 
       {/* ======================================================================
-          SECTION 3: RECOMMENDATIONS / SIMILAR FILMS
+          SECTION 3: RECOMMENDATIONS / SIMILAR TITLES
           ====================================================================== */}
       {movie.recommendations && movie.recommendations.length > 0 && (
         <section className="section-block" style={{ marginTop: "4rem" }}>
@@ -509,4 +539,3 @@ export default function MovieDetails() {
     </main>
   );
 }
-

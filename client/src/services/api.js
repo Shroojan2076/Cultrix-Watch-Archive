@@ -246,16 +246,21 @@ export async function searchMovies(query, page = 1) {
     return data.data;
 }
 
-export async function getMovieDetails(tmdbId) {
-    const response = await fetch(`${API_URL}/api/cinema/movie/${tmdbId}`, {
+export const searchCinema = searchMovies;
+
+export async function getMovieDetails(tmdbId, mediaType) {
+    const typeQuery = mediaType ? `?type=${encodeURIComponent(mediaType)}` : "";
+    const response = await fetch(`${API_URL}/api/cinema/movie/${tmdbId}${typeQuery}`, {
         headers: { Accept: "application/json" }
     });
     const data = await response.json();
     if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch movie details");
+        throw new Error(data.error || "Failed to fetch cinema details");
     }
     return data.data;
 }
+
+export const getCinemaDetails = getMovieDetails;
 
 /* ==========================================================================
    Movie Watchlist API Methods

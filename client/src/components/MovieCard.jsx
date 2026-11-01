@@ -7,7 +7,9 @@ export default function MovieCard({
 }) {
   if (!movie) return null;
 
-  const title = movie.title || movie.original_title || "Untitled";
+  const isTv = movie.media_type === "tv" || (!movie.title && !!movie.name);
+  const typeLabel = isTv ? "SERIES" : "FILM";
+  const title = movie.title || movie.name || movie.original_title || movie.original_name || "Untitled";
   const posterUrl = movie.poster_path
     ? (movie.poster_path.startsWith("http")
         ? movie.poster_path
@@ -19,14 +21,15 @@ export default function MovieCard({
         : `https://image.tmdb.org/t/p/w780${movie.backdrop_path}`)
     : null;
   const score = movie.vote_average ? Number(movie.vote_average).toFixed(1) : null;
-  const year = movie.release_date ? movie.release_date.slice(0, 4) : null;
+  const year = (movie.release_date || movie.first_air_date || "").slice(0, 4) || null;
   const tmdbId = movie.id || movie.tmdb_id;
+  const linkUrl = `/cinema/${tmdbId}${isTv ? "?type=tv" : ""}`;
 
   // 1. Landscape 16:9 Widescreen Film Still Card (Cinematic Specialization)
   if (variant === "landscape") {
     const imageUrl = backdropUrl || posterUrl;
     return (
-      <Link to={`/cinema/${tmdbId}`} className="movie-landscape-card-link">
+      <Link to={linkUrl} className="movie-landscape-card-link">
         <article className="movie-landscape-card">
           <div className="movie-landscape-frame">
             {imageUrl ? (
@@ -50,13 +53,13 @@ export default function MovieCard({
             )}
 
             <div className="movie-landscape-format font-mono">
-              35MM
+              {isTv ? "TV" : "35MM"}
             </div>
           </div>
 
           <div className="movie-landscape-details">
             <div className="movie-landscape-meta font-mono">
-              <span>FILM</span>
+              <span>{typeLabel}</span>
               {year && <span>• {year}</span>}
               {movie.original_language && (
                 <span>• {movie.original_language.toUpperCase()}</span>
@@ -81,7 +84,7 @@ export default function MovieCard({
   // 2. List Row Variant (Used for Search/Explore List View)
   if (variant === "row") {
     return (
-      <Link to={`/cinema/${tmdbId}`} className="film-row-link">
+      <Link to={linkUrl} className="film-row-link">
         <article className="film-row-card">
           <div className="film-row-thumb">
             {posterUrl ? (
@@ -93,9 +96,10 @@ export default function MovieCard({
 
           <div className="film-row-content">
             <div className="film-row-meta font-mono">
-              <span className="film-row-type">FILM</span>
+              <span className="film-row-type">{typeLabel}</span>
               {year && <span>• {year}</span>}
               {movie.runtime && <span>• {movie.runtime} min</span>}
+              {movie.number_of_seasons && <span>• {movie.number_of_seasons} Season{movie.number_of_seasons > 1 ? "s" : ""}</span>}
               {movie.original_language && (
                 <span>• {movie.original_language.toUpperCase()}</span>
               )}
@@ -123,7 +127,7 @@ export default function MovieCard({
 
   // 3. Default Disciplined Film Poster Card (Strict 2:3 ratio)
   return (
-    <Link to={`/cinema/${tmdbId}`} className="film-card-link">
+    <Link to={linkUrl} className="film-card-link">
       <article className="film-card">
         {/* Strictly 2:3 poster frame */}
         <div className="film-card-poster">
@@ -148,14 +152,14 @@ export default function MovieCard({
           )}
 
           <div className="film-format-badge font-mono">
-            FILM
+            {typeLabel}
           </div>
         </div>
 
         {/* Disciplined Details: Aligned rows */}
         <div className="film-card-details">
           <div className="film-card-subline font-mono">
-            <span>FILM</span>
+            <span>{typeLabel}</span>
             {year && <span>• {year}</span>}
           </div>
 

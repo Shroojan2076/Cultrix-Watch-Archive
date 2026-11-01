@@ -224,6 +224,8 @@ export default function MovieWatchlist() {
                   : null;
 
                 const isWatched = movie.status === "watched";
+                const isTv = movie.media_type === "tv";
+                const linkUrl = `/cinema/${movie.tmdb_id}${isTv ? "?type=tv" : ""}`;
 
                 const genreList = Array.isArray(movie.genres)
                   ? movie.genres
@@ -243,7 +245,7 @@ export default function MovieWatchlist() {
                     {/* Widescreen Landscape Still Artwork Frame */}
                     <div className="film-archive-artwork-frame">
                       <Link
-                        to={`/cinema/${movie.tmdb_id}`}
+                        to={linkUrl}
                         className="film-archive-artwork-link"
                         tabIndex={-1}
                         aria-hidden="true"
@@ -281,21 +283,21 @@ export default function MovieWatchlist() {
                       </div>
 
                       <div className="film-archive-format-watermark font-mono">
-                        35MM FILM
+                        {isTv ? "TV SERIES" : "35MM FILM"}
                       </div>
                     </div>
 
                     {/* Archival Dossier Body */}
                     <div className="film-archive-entry-body">
                       <div className="film-archive-meta-line font-mono">
-                        <span className="film-archive-spec-type">CINEMA</span>
+                        <span className="film-archive-spec-type">{isTv ? "TV SERIES" : "CINEMA"}</span>
                         {releaseYear && <span>• {releaseYear}</span>}
                         {movie.runtime && <span>• {movie.runtime}m</span>}
                         {genreList && <span>• {genreList.toUpperCase()}</span>}
                       </div>
 
                       <h2 className="film-archive-entry-title font-display">
-                        <Link to={`/cinema/${movie.tmdb_id}`} title={movie.title}>
+                        <Link to={linkUrl} title={movie.title}>
                           {movie.title}
                         </Link>
                       </h2>
@@ -348,7 +350,7 @@ export default function MovieWatchlist() {
                         {/* Item Actions */}
                         <div className="film-archive-row-actions">
                           <Link
-                            to={`/cinema/${movie.tmdb_id}`}
+                            to={linkUrl}
                             className="film-archive-link-dossier font-headline"
                           >
                             Dossier →

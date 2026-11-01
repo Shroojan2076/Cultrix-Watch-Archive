@@ -146,13 +146,17 @@ export default function CinemaExplore() {
   const sortedMovies = useMemo(() => {
     return [...movieList].sort((a, b) => {
       if (sortBy === "title_asc") {
-        return (a.title || "").localeCompare(b.title || "");
+        const titleA = a.title || a.name || "";
+        const titleB = b.title || b.name || "";
+        return titleA.localeCompare(titleB);
       }
       if (sortBy === "rating_desc") {
         return (Number(b.vote_average) || 0) - (Number(a.vote_average) || 0);
       }
       if (sortBy === "date_desc") {
-        return (b.release_date || "").localeCompare(a.release_date || "");
+        const dateA = a.release_date || a.first_air_date || "";
+        const dateB = b.release_date || b.first_air_date || "";
+        return dateB.localeCompare(dateA);
       }
       // default popularity
       return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
@@ -178,7 +182,7 @@ export default function CinemaExplore() {
               : "CINÉMATHÈQUE // FILM ARCHIVE"}
           </h1>
           <span className="search-count-label font-mono">
-            {movieList.length > 0 ? `${movieList.length} films loaded` : ""}
+            {movieList.length > 0 ? `${movieList.length} titles loaded` : ""}
           </span>
         </div>
 
@@ -201,7 +205,7 @@ export default function CinemaExplore() {
           <input
             type="text"
             className="search-field font-headline"
-            placeholder="Search films by title, director, keyword..."
+            placeholder="Search films & series by title, director, creator..."
             value={inputQuery}
             onChange={(e) => setInputQuery(e.target.value)}
           />
@@ -290,7 +294,7 @@ export default function CinemaExplore() {
         </div>
       ) : sortedMovies.length === 0 ? (
         <div className="search-empty-state">
-          <h2 className="empty-title font-headline">No films found</h2>
+          <h2 className="empty-title font-headline">No titles found</h2>
           <p className="empty-desc">
             Try adjusting your search terms or exploring a different genre.
           </p>
@@ -332,7 +336,7 @@ export default function CinemaExplore() {
                 onClick={handleLoadMore}
                 disabled={loadingMore}
               >
-                {loadingMore ? "Loading More..." : "Load More Films ↓"}
+                {loadingMore ? "Loading More..." : "Load More Titles ↓"}
               </button>
             </div>
           )}
