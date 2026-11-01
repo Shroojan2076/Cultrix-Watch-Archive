@@ -25,56 +25,19 @@ const configuredOrigins = process.env.CLIENT_URL
 
 const allowedOrigins = Array.from(new Set([...localOrigins, ...configuredOrigins]));
 
-function isAllowedOrigin(origin) {
-  // Allow non-browser requests (e.g. mobile apps, curl, server-to-server)
-  if (!origin) {
-    return true;
-  }
-
-  const normalized = origin.trim().replace(/\/$/, "");
-
-  // 1. Check exact allowed origins (local development + explicitly configured URLs)
-  if (allowedOrigins.includes(normalized)) {
-    return true;
-  }
-
-  // 2. Constrained Vercel preview match:
-  // If and only if a trusted Vercel URL is specified in CLIENT_URL,
-  // allow previews that strictly belong to that exact project scope.
-  try {
-    const parsedOrigin = new URL(normalized);
-    if (parsedOrigin.protocol !== "https:" || !parsedOrigin.hostname.endsWith(".vercel.app")) {
-      return false;
-    }
-
-    const originHostname = parsedOrigin.hostname.toLowerCase();
-
-    return configuredOrigins.some((configured) => {
-      try {
-        const confUrl = new URL(configured);
-        if (!confUrl.hostname.endsWith(".vercel.app")) return false;
-
-        const baseProject = confUrl.hostname.toLowerCase().replace(/\.vercel\.app$/, "");
-        if (!baseProject || baseProject.length < 2) return false;
-
-        // Escape regex special chars
-        const safeProject = baseProject.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-        // Strict preview pattern: <project>.vercel.app or <project>-<preview-slug>.vercel.app
-        const previewRegex = new RegExp(`^${safeProject}(-[a-z0-9-]+)?\\.vercel\\.app$`, "i");
-        return previewRegex.test(originHostname);
-      } catch {
-        return false;
-      }
-    });
-  } catch {
-    return false;
-  }
-}
-
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (isAllowedOrigin(origin)) {
+      // Allow non-browser requests (like server-to-server, mobile testing tools, or postman/curl)
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // Normalize the origin string
+      const normalized = origin.trim().replace(/\/$/, "").toLowerCase();
+
+      // STRICT CHECK: Exclusively allow only this Vercel deployment
+      if (normalized === "https://vercel.app") {
         return callback(null, true);
       }
 
@@ -89,9 +52,10 @@ app.use(
   })
 );
 
+
 app.use(express.json());
 app.use(express.urlencoded({
-    extended: true
+  extended: true
 }));
 
 // API Routes
@@ -103,16 +67,16 @@ app.use(movieWatchlistRoutes);
 
 // 404 Not Found JSON Handler
 app.use((req, res) => {
-    res.status(404).json({ error: `Cannot ${req.method} ${req.originalUrl}` });
+  res.status(404).json({ error: `Cannot ${req.method} ${req.originalUrl}` });
 });
 
 // Centralized JSON Error Handler
 app.use((err, req, res, next) => {
-    console.error("Unhandled Server Error:", err.stack || err.message);
-    const status = err.status || err.statusCode || 500;
-    res.status(status).json({ error: err.message || "Internal server error" });
+  console.error("Unhandled Server Error:", err.stack || err.message);
+  const status = err.status || err.statusCode || 500;
+  res.status(status).json({ error: err.message || "Internal server error" });
 });
 
 app.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at http://localhost:${port}`);
 });
