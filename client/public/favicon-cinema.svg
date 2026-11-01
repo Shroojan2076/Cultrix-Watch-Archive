@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <rect width="32" height="32" rx="6" fill="#07090C"/>
+  <!-- CULTRIX Cinema 35mm Celluloid Matrix X -->
+  <!-- Celluloid Ribbon 1: Top-Left to Bottom-Right -->
+  <polygon points="5,4 9.5,4 27,28 22.5,28" fill="#F7F5F0"/>
+  <!-- Precision 35mm Film Sprocket Perforations -->
+  <rect x="6" y="7.5" width="2" height="2.5" rx="0.4" fill="#07090C" transform="rotate(-45 7 8.75)"/>
+  <rect x="23" y="22.5" width="2" height="2.5" rx="0.4" fill="#07090C" transform="rotate(-45 24 23.75)"/>
+  
+  <!-- Celluloid Ribbon 2: Ascending Arm -->
+  <polygon points="5,28 9.5,28 13.5,22.5 9.5,22.5" fill="#F7F5F0"/>
+  <rect x="6" y="22.5" width="2" height="2.5" rx="0.4" fill="#07090C" transform="rotate(45 7 23.75)"/>
+  
+  <!-- Upper Ascending Arm in 35mm Film Gold/Amber -->
+  <polygon points="18.5,9.5 22.5,9.5 27,4 22.5,4" fill="#E5A93C"/>
+  <rect x="23" y="7.5" width="2" height="2.5" rx="0.4" fill="#07090C" transform="rotate(45 24 8.75)"/>
+  
+  <!-- Anamorphic Widescreen Gate / Aperture (Golden Frame) -->
+  <rect x="11" y="13.5" width="10" height="5.5" rx="1" fill="#E5A93C"/>
+  <rect x="13" y="14.5" width="6" height="3.5" rx="0.5" fill="#07090C"/>
+</svg>
+

@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { useMode } from "../context/useMode";
+import CultrixSymbol from "./CultrixSymbol";
 
 export default function Footer() {
-  const { switchMode, isCinema } = useMode();
+  const { switchMode } = useMode();
 
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -14,11 +15,13 @@ export default function Footer() {
         {/* Distro Column */}
         <div className="footer-col-about">
           <div className="footer-brand">
-            <span className="jp-brand-mark">{isCinema ? "キネマ" : "月刊"}</span>
-            <span className="footer-title font-display">YŪGEN INDEX</span>
+            <CultrixSymbol size={28} className="footer-symbol" />
+            <span className="footer-title cultrix-wordmark">
+              CULTRI<span className="cultrix-x">X</span>
+            </span>
           </div>
           <p className="footer-manifesto">
-            An independent dual-medium catalogue and discovery archive. Dedicated to lovers of Japanese animation craft and boundary-pushing cinema worldwide.
+            An independent index of visual culture. Discover, explore and collect stories across animation and cinema.
           </p>
           <div className="footer-meta font-mono">
             <span>Anime data via MyAnimeList • Cinema data via TMDB</span>
@@ -105,7 +108,7 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom font-mono">
-        <span>© {new Date().getFullYear()} YŪGEN INDEX // 幽玄索引. Dual-Medium Anime & Cinema Platform.</span>
+        <span>© {new Date().getFullYear()} CULTRIX. Culture Has No Boundaries.</span>
       </div>
     </footer>
   );

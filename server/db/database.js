@@ -4,7 +4,7 @@ import "dotenv/config";
 const isCloudDb = !!process.env.DATABASE_URL && !process.env.DATABASE_URL.includes("localhost");
 
 /**
- * YŪGEN INDEX Database Architecture & Connection Pool
+ * CULTRIX Database Architecture & Connection Pool
  *
  * TENANCY & AUTHENTICATION ARCHITECTURE NOTE:
  * Authentication is currently not implemented. Both the Anime watchlist (`watchlist`)

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useMode } from "../context/useMode";
+import CultrixSymbol from "./CultrixSymbol";
 
 export default function Header() {
   const [query, setQuery] = useState("");
@@ -27,10 +28,14 @@ export default function Header() {
         {/* Brand Link */}
         <div className="masthead-brand">
           <Link to={homePath} className="brand-link" onClick={() => setMobileMenuOpen(false)}>
-            <span className="jp-brand-mark">{isCinema ? "キネマ" : "月刊"}</span>
+            <CultrixSymbol size={26} className="brand-symbol" />
             <div className="brand-text">
-              <span className="brand-title font-display">YŪGEN INDEX</span>
-              <span className="brand-sub font-mono">{isCinema ? "CINÉMATHÈQUE // 映画の記憶" : "ANIME ARCHIVE // アニメ"}</span>
+              <span className="brand-title cultrix-wordmark">
+                CULTRI<span className="cultrix-x">X</span>
+              </span>
+              <span className="brand-sub font-mono">
+                {isCinema ? "CINEMA / FILM ARCHIVE" : "ANIME / ANIMATION ARCHIVE"}
+              </span>
             </div>
           </Link>
         </div>

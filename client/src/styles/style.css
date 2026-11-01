@@ -1,5 +1,5 @@
 /* ==========================================================================
-   YŪGEN INDEX // 幽玄索引
+   CULTRIX // CULTURE + MATRIX
    Dual-Medium Platform: Anime Mode & Cinema Mode Architecture
    ========================================================================== */
 
@@ -74,7 +74,17 @@ button, input, select {
 .masthead-brand .brand-link {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.brand-symbol {
+  flex-shrink: 0;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-link:hover .brand-symbol {
+  transform: scale(1.06);
 }
 
 .brand-text {
@@ -82,18 +92,55 @@ button, input, select {
   flex-direction: column;
 }
 
-.brand-title {
-  font-size: 1.35rem;
+.cultrix-wordmark {
+  font-family: 'Space Grotesk', -apple-system, sans-serif !important;
+  font-size: 1.32rem;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: 0.08em;
+  line-height: 1;
   color: var(--color-text-main);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  user-select: none;
+}
+
+.cultrix-wordmark .cultrix-x {
+  color: var(--color-accent);
+  display: inline-block;
+  transition: color 400ms cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease;
+}
+
+.brand-link:hover .cultrix-wordmark .cultrix-x,
+.about-brand-tag:hover .cultrix-wordmark .cultrix-x,
+.footer-brand:hover .cultrix-wordmark .cultrix-x {
+  color: var(--color-accent-hover);
+  transform: scale(1.08);
+}
+
+.cultrix-symbol {
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+}
+
+.brand-link:hover .cultrix-symbol {
+  transform: scale(1.06);
+}
+
+[data-theme="cinema"] .cultrix-symbol {
+  filter: drop-shadow(0 0 6px rgba(229, 169, 60, 0.3));
+}
+
+[data-theme="anime"] .cultrix-symbol {
+  filter: drop-shadow(0 0 6px rgba(226, 56, 38, 0.25));
 }
 
 .brand-sub {
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   letter-spacing: 0.12em;
   color: var(--color-text-muted);
+  margin-top: 3px;
+  line-height: 1.2;
 }
 
 .desktop-nav {
@@ -216,14 +263,17 @@ button, input, select {
 .footer-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 14px;
 }
 
-.footer-title {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: var(--color-text-main);
+.footer-symbol {
+  flex-shrink: 0;
+}
+
+.footer-title.cultrix-wordmark {
+  font-size: 1.35rem;
+  letter-spacing: 0.08em;
 }
 
 .footer-manifesto {
@@ -836,14 +886,17 @@ button, input, select {
 .about-brand-tag {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.about-brand-title {
+.about-brand-symbol {
+  flex-shrink: 0;
+}
+
+.about-brand-title.cultrix-wordmark {
   font-size: 1.15rem;
-  letter-spacing: 0.05em;
-  color: var(--color-text-main);
+  letter-spacing: 0.08em;
 }
 
 .about-tagline {
@@ -2030,7 +2083,7 @@ button, input, select {
 }
 
 /* ==========================================================================
-   YŪGEN INDEX // 幽玄索引
+   CULTRIX // CULTURE + MATRIX
    Dual-Medium Platform Extensions: Mode Switcher & Cinema System
    ========================================================================== */
 
@@ -2901,11 +2954,6 @@ button, input, select {
 /* --------------------------------------------------------------------------
    Dynamic Theme Specializations (Cinema vs Anime)
    -------------------------------------------------------------------------- */
-[data-theme="cinema"] .brand-title {
-  font-family: var(--font-display);
-  letter-spacing: 0.06em;
-  font-weight: 800;
-}
 
 [data-theme="cinema"] .nav-item.active {
   color: var(--color-accent);

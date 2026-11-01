@@ -105,7 +105,7 @@ async function tmdbFetch(endpoint, params = {}) {
         },
         headers: {
           Accept: "application/json",
-          "User-Agent": "YugenIndex/2.0 (CinemaArchive)"
+          "User-Agent": "Cultrix/2.0 (CinemaArchive)"
         },
         timeout: 10000
       });

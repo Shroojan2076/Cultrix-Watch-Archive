@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import AnimeCard from "../components/AnimeCard";
+import CultrixSymbol from "../components/CultrixSymbol";
 import { searchAnime, getAnimeRanking } from "../services/api";
 import { getAnimeTitle } from "../utils/animeTitles";
 
@@ -286,17 +287,18 @@ export default function Home() {
 
       {/* ======================================================================
           SECTION 4: ABOUT BRAND NOTE
-          Clean, honest community statement.
+          Shared visual culture statement.
           ====================================================================== */}
       <section className="about-footer-strip">
         <div className="about-strip-content">
           <div className="about-brand-tag">
-            <span className="jp-brand-mark">月刊</span>
-            <span className="font-condensed about-brand-title">YŪGEN INDEX</span>
+            <CultrixSymbol size={22} className="about-brand-symbol" />
+            <span className="about-brand-title cultrix-wordmark">
+              CULTRI<span className="cultrix-x">X</span>
+            </span>
           </div>
           <p className="about-tagline">
-            An independent anime catalogue and personal watchlist. Built for enthusiasts who care about
-            storytelling depth, art direction, and hand-drawn animation craft. Powered by MyAnimeList.
+            An independent platform for visual culture, bringing together the worlds of animation and cinema. Built for people who appreciate storytelling, artistic expression and the experiences that stay with them.
           </p>
         </div>
       </section>

@@ -6,11 +6,13 @@ export function ModeProvider({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Mode is derived directly from the URL pathname, with localStorage fallback
+  // Mode is derived directly from the URL pathname, with backward-compatible localStorage fallback
   const mode = useMemo(() => {
     if (location.pathname.startsWith("/cinema")) return "cinema";
     if (location.pathname.startsWith("/anime")) return "anime";
-    const saved = localStorage.getItem("yugen_index_mode");
+    const saved =
+      localStorage.getItem("cultrix_mode") ||
+      localStorage.getItem("yugen_index_mode");
     return saved === "cinema" ? "cinema" : "anime";
   }, [location.pathname]);
 
@@ -27,13 +29,19 @@ export function ModeProvider({ children }) {
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", mode);
     document.body.setAttribute("data-theme", mode);
+
+    // Dynamically update browser tab favicon to reflect the active medium's X symbol
+    const faviconLink = document.querySelector("link[rel~='icon']");
+    if (faviconLink) {
+      faviconLink.href = mode === "cinema" ? "/favicon-cinema.svg" : "/favicon.svg";
+    }
   }, [mode]);
 
   const switchMode = useCallback(
     (newMode) => {
       if (newMode === mode) return;
 
-      localStorage.setItem("yugen_index_mode", newMode);
+      localStorage.setItem("cultrix_mode", newMode);
 
       // Context-sensitive path transition
       const currentPath = location.pathname;

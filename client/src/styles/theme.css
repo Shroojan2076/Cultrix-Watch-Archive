@@ -2,7 +2,7 @@
 
 @layer base {
   /* ==========================================================================
-     YŪGEN INDEX // 幽玄索引
+     CULTRIX // CULTURE + MATRIX
      DYNAMIC DUAL-THEME ARCHITECTURE: ANIME MODE vs CINEMA MODE
      ========================================================================== */
 
@@ -214,6 +214,8 @@ body,
 .site-header,
 .site-footer,
 .masthead-container,
+.cultrix-symbol,
+.cultrix-x,
 .medium-switcher,
 .medium-tab,
 .desktop-nav .nav-item,
