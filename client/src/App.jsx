@@ -24,17 +24,21 @@ function RootRedirect() {
 
 function LegacySearchRedirect() {
   const [searchParams] = useSearchParams();
+  const { mode } = useMode();
   const q = searchParams.get("q");
+  const target = mode === "cinema" ? "/cinema/explore" : "/anime/explore";
   return (
     <Navigate
-      to={q ? `/anime/explore?q=${encodeURIComponent(q)}` : "/anime/explore"}
+      to={q ? `${target}?q=${encodeURIComponent(q)}` : target}
       replace
     />
   );
 }
 
 function LegacyWatchlistRedirect() {
-  return <Navigate to="/anime/watchlist" replace />;
+  const { mode } = useMode();
+  const target = mode === "cinema" ? "/cinema/watchlist" : "/anime/watchlist";
+  return <Navigate to={target} replace />;
 }
 
 function AppRoutes() {

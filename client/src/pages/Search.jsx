@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import AnimeCard from "../components/AnimeCard";
 import { searchAnime, loadMoreAnime } from "../services/api";
 import { getAnimeTitle } from "../utils/animeTitles";
@@ -276,15 +276,24 @@ export default function Search() {
               <div className="search-no-results">
                 <h3 className="no-results-title font-condensed">NO ANIME FOUND</h3>
                 <p className="no-results-desc">
-                  No titles matched "{urlQuery}". Try searching for popular titles like "Cyberpunk", "Attack on Titan", or "Death Note".
+                  No anime matched "{urlQuery}". If you are searching for a feature film or TV series, switch to the Cinema Archive:
                 </p>
-                <button
-                  type="button"
-                  className="btn-primary-action font-headline"
-                  onClick={() => handleQuickGenre("Popular")}
-                >
-                  Browse Popular Anime
-                </button>
+                <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", justifyContent: "center", marginTop: "1rem" }}>
+                  <Link
+                    to={`/cinema/explore?q=${encodeURIComponent(urlQuery)}`}
+                    className="btn-primary-action font-headline"
+                    style={{ textDecoration: "none" }}
+                  >
+                    Search Cinema for "{urlQuery}" (Films & TV) →
+                  </Link>
+                  <button
+                    type="button"
+                    className="btn-spotlight-secondary font-headline"
+                    onClick={() => handleQuickGenre("Popular")}
+                  >
+                    Browse Popular Anime
+                  </button>
+                </div>
               </div>
             )
           )}

@@ -4,8 +4,8 @@ import MovieCard from "../../components/MovieCard";
 import {
   searchMovies,
   discoverMoviesByGenre,
-  getCinemaPopular,
-  getCinemaTopRated
+  getCinemaTopRated,
+  getCinemaTrending
 } from "../../services/api";
 
 const CINEMA_GENRES = [
@@ -36,8 +36,11 @@ export default function CinemaExplore() {
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
+  const [mediaFilter, setMediaFilter] = useState("all"); // "all", "tv", "movie"
 
-  const initialSort = urlSort === "rating" || urlSort === "rating_desc" || urlGenre === "top_rated"
+  const initialSort = urlQuery.trim()
+    ? "relevance"
+    : urlSort === "rating" || urlSort === "rating_desc" || urlGenre === "top_rated"
     ? "rating_desc"
     : urlSort === "date_desc"
     ? "date_desc"
@@ -51,6 +54,9 @@ export default function CinemaExplore() {
   if (urlQuery !== prevUrlQuery) {
     setPrevUrlQuery(urlQuery);
     setInputQuery(urlQuery);
+    if (urlQuery.trim()) {
+      setSortBy("relevance");
+    }
   }
 
   useEffect(() => {
@@ -70,7 +76,8 @@ export default function CinemaExplore() {
         } else if (urlGenre && urlGenre !== "popular") {
           data = await discoverMoviesByGenre(urlGenre, 1);
         } else {
-          data = await getCinemaPopular(1);
+          // Mixed trending movies & TV shows on default exploration
+          data = await getCinemaTrending("week", 1);
         }
 
         if (isMounted) {
@@ -79,7 +86,7 @@ export default function CinemaExplore() {
         }
       } catch (err) {
         if (isMounted) {
-          setError(err.message || "Failed to fetch movies.");
+          setError(err.message || "Failed to fetch titles.");
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -131,20 +138,34 @@ export default function CinemaExplore() {
       } else if (urlGenre && urlGenre !== "popular") {
         data = await discoverMoviesByGenre(urlGenre, nextPage);
       } else {
-        data = await getCinemaPopular(nextPage);
+        data = await getCinemaTrending("week", nextPage);
       }
 
       setMovieList(prev => [...prev, ...(data.results || [])]);
       setCurrentPage(nextPage);
     } catch (err) {
-      setError(err.message || "Failed to load more films.");
+      setError(err.message || "Failed to load more titles.");
     } finally {
       setLoadingMore(false);
     }
   }
 
-  const sortedMovies = useMemo(() => {
-    return [...movieList].sort((a, b) => {
+  const tvCount = useMemo(() => movieList.filter(m => m.media_type === "tv").length, [movieList]);
+  const filmCount = useMemo(() => movieList.filter(m => m.media_type === "movie").length, [movieList]);
+
+  const sortedAndFilteredMovies = useMemo(() => {
+    let list = [...movieList];
+    if (mediaFilter === "movie") {
+      list = list.filter(m => m.media_type === "movie");
+    } else if (mediaFilter === "tv") {
+      list = list.filter(m => m.media_type === "tv");
+    }
+
+    if (sortBy === "relevance" && urlQuery.trim()) {
+      return list;
+    }
+
+    return list.sort((a, b) => {
       if (sortBy === "title_asc") {
         const titleA = a.title || a.name || "";
         const titleB = b.title || b.name || "";
@@ -161,7 +182,7 @@ export default function CinemaExplore() {
       // default popularity
       return (Number(b.popularity) || 0) - (Number(a.popularity) || 0);
     });
-  }, [movieList, sortBy]);
+  }, [movieList, sortBy, mediaFilter, urlQuery]);
 
   const activeGenreId = urlQuery ? null : (urlGenre || "popular");
 
@@ -179,10 +200,12 @@ export default function CinemaExplore() {
               ? "CANONICAL SELECTIONS // ALL-TIME BEST"
               : activeGenreId && activeGenreId !== "popular"
               ? `CINEMA ARCHIVE // ${CINEMA_GENRES.find((g) => String(g.id) === String(activeGenreId))?.label.toUpperCase() || "SELECTIONS"}`
-              : "CINÉMATHÈQUE // FILM ARCHIVE"}
+              : "CINÉMATHÈQUE // FILMS & SERIES"}
           </h1>
           <span className="search-count-label font-mono">
-            {movieList.length > 0 ? `${movieList.length} titles loaded` : ""}
+            {movieList.length > 0
+              ? `${movieList.length} titles loaded (${tvCount} series, ${filmCount} films)`
+              : ""}
           </span>
         </div>
 
@@ -242,21 +265,49 @@ export default function CinemaExplore() {
       </section>
 
       {/* ======================================================================
-          LEVEL 2: VIEW CONTROLS & RESULTS BAR
+          LEVEL 2: VIEW CONTROLS & MEDIUM FILTER TABS
           ====================================================================== */}
       <section className="search-controls-bar">
-        <div className="controls-left font-mono">
-          <span>SORT BY:</span>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="sort-dropdown font-mono"
-          >
-            <option value="popularity_desc">Popularity</option>
-            <option value="rating_desc">Highest Rated</option>
-            <option value="title_asc">Title (A–Z)</option>
-            <option value="date_desc">Release Date</option>
-          </select>
+        <div className="controls-left font-mono" style={{ display: "flex", gap: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
+          {/* Media Type Toggle Filter */}
+          <div className="cinema-type-pills-wrap font-mono" role="group" aria-label="Filter medium">
+            <button
+              type="button"
+              className={`genre-filter-pill ${mediaFilter === "all" ? "active" : ""}`}
+              onClick={() => setMediaFilter("all")}
+            >
+              ALL ({movieList.length})
+            </button>
+            <button
+              type="button"
+              className={`genre-filter-pill ${mediaFilter === "tv" ? "active" : ""}`}
+              onClick={() => setMediaFilter("tv")}
+            >
+              SERIES ({tvCount})
+            </button>
+            <button
+              type="button"
+              className={`genre-filter-pill ${mediaFilter === "movie" ? "active" : ""}`}
+              onClick={() => setMediaFilter("movie")}
+            >
+              FILMS ({filmCount})
+            </button>
+          </div>
+
+          <div className="sort-wrap">
+            <span>SORT:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="sort-dropdown font-mono"
+            >
+              {urlQuery.trim() && <option value="relevance">Relevance</option>}
+              <option value="popularity_desc">Popularity</option>
+              <option value="rating_desc">Highest Rated</option>
+              <option value="title_asc">Title (A–Z)</option>
+              <option value="date_desc">Release Date</option>
+            </select>
+          </div>
         </div>
 
         <div className="controls-right">
@@ -286,39 +337,44 @@ export default function CinemaExplore() {
           ====================================================================== */}
       {loading ? (
         <div className="search-loading font-mono">
-          <span>Loading cinema catalogue...</span>
+          <span>Loading cinema archive...</span>
         </div>
       ) : error ? (
         <div className="search-error font-mono">
           <span>{error}</span>
         </div>
-      ) : sortedMovies.length === 0 ? (
+      ) : sortedAndFilteredMovies.length === 0 ? (
         <div className="search-empty-state">
           <h2 className="empty-title font-headline">No titles found</h2>
           <p className="empty-desc">
-            Try adjusting your search terms or exploring a different genre.
+            {mediaFilter !== "all"
+              ? `No ${mediaFilter === "tv" ? "TV series" : "films"} found in current results.`
+              : "Try adjusting your search terms or exploring a different genre."}
           </p>
           <button
             type="button"
             className="empty-reset-btn font-headline"
-            onClick={handleClearSearch}
+            onClick={mediaFilter !== "all" ? () => setMediaFilter("all") : handleClearSearch}
           >
-            Reset Filters
+            {mediaFilter !== "all" ? "Show All Titles" : "Reset Filters"}
           </button>
         </div>
       ) : (
         <>
           {viewMode === "grid" ? (
             <div className="uniform-poster-grid">
-              {sortedMovies.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+              {sortedAndFilteredMovies.map((movie) => (
+                <MovieCard
+                  key={`${movie.media_type || "item"}-${movie.id || movie.tmdb_id}`}
+                  movie={movie}
+                />
               ))}
             </div>
           ) : (
             <div className="film-list-rows-view">
-              {sortedMovies.map((movie) => (
+              {sortedAndFilteredMovies.map((movie) => (
                 <MovieCard
-                  key={movie.id}
+                  key={`${movie.media_type || "item"}-${movie.id || movie.tmdb_id}`}
                   movie={movie}
                   variant="row"
                   showSynopsis={true}

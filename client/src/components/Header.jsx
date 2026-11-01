@@ -112,7 +112,7 @@ export default function Header() {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={isCinema ? "Search cinema & films..." : "Search anime..."}
+              placeholder={isCinema ? "Search movies & TV series..." : "Search anime..."}
               className="header-search-input"
             />
           </form>
