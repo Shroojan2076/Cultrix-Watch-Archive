@@ -77,7 +77,7 @@ function validateReleaseDate(date) {
 
 /**
  * GET /api/cinema/watchlist
- * Retrieve all movies in the cinema watchlist
+ * Retrieve all movies & series in the cinema watchlist
  */
 router.get("/api/cinema/watchlist", async (req, res, next) => {
   try {
@@ -96,6 +96,7 @@ router.get("/api/cinema/watchlist", async (req, res, next) => {
         overview,
         genres,
         vote_average,
+        media_type,
         created_at,
         updated_at
       FROM movie_watchlist
@@ -104,14 +105,14 @@ router.get("/api/cinema/watchlist", async (req, res, next) => {
 
     return res.json({ data: rows });
   } catch (error) {
-    console.error("Failed to load movie watchlist:", error.message);
+    console.error("Failed to load cinema watchlist:", error.message);
     next(error);
   }
 });
 
 /**
  * POST /api/cinema/watchlist/add
- * Add or upsert movie in movie_watchlist with strict validation
+ * Add or upsert movie or series in movie_watchlist with strict validation
  */
 router.post("/api/cinema/watchlist/add", async (req, res, next) => {
   const {
@@ -126,7 +127,8 @@ router.post("/api/cinema/watchlist/add", async (req, res, next) => {
     score,
     overview,
     genres = [],
-    vote_average
+    vote_average,
+    media_type
   } = req.body;
 
   // 1. Validate required fields
@@ -169,6 +171,8 @@ router.post("/api/cinema/watchlist/add", async (req, res, next) => {
     }
   }
 
+  const validatedMediaType = media_type === "tv" ? "tv" : "movie";
+
   try {
     const { rows } = await pool.query(
       `
@@ -185,9 +189,10 @@ router.post("/api/cinema/watchlist/add", async (req, res, next) => {
         overview,
         genres,
         vote_average,
+        media_type,
         updated_at
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, CURRENT_TIMESTAMP)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, CURRENT_TIMESTAMP)
       ON CONFLICT (tmdb_id) DO UPDATE SET
         title = EXCLUDED.title,
         original_title = COALESCE(EXCLUDED.original_title, movie_watchlist.original_title),
@@ -200,6 +205,7 @@ router.post("/api/cinema/watchlist/add", async (req, res, next) => {
         overview = COALESCE(EXCLUDED.overview, movie_watchlist.overview),
         genres = COALESCE(EXCLUDED.genres, movie_watchlist.genres),
         vote_average = COALESCE(EXCLUDED.vote_average, movie_watchlist.vote_average),
+        media_type = COALESCE(EXCLUDED.media_type, movie_watchlist.media_type),
         updated_at = CURRENT_TIMESTAMP
       RETURNING *
       `,
@@ -215,23 +221,24 @@ router.post("/api/cinema/watchlist/add", async (req, res, next) => {
         scoreCheck.value,
         overview || null,
         JSON.stringify(Array.isArray(genres) ? genres : []),
-        sanitizedVoteAverage
+        sanitizedVoteAverage,
+        validatedMediaType
       ]
     );
 
     return res.status(201).json({
-      message: "Movie saved to watchlist",
+      message: "Item saved to cinema watchlist",
       data: rows[0]
     });
   } catch (error) {
-    console.error("Failed to add movie to watchlist:", error.message);
+    console.error("Failed to add item to cinema watchlist:", error.message);
     next(error);
   }
 });
 
 /**
  * PUT /api/cinema/watchlist/:tmdbId
- * Update movie watchlist item (status, score) with strict validation
+ * Update cinema watchlist item (status, score) with strict validation
  */
 router.put("/api/cinema/watchlist/:tmdbId", async (req, res, next) => {
   const tmdbCheck = validateTmdbId(req.params.tmdbId);
@@ -280,22 +287,22 @@ router.put("/api/cinema/watchlist/:tmdbId", async (req, res, next) => {
     );
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "Movie not found in watchlist" });
+      return res.status(404).json({ error: "Item not found in cinema watchlist" });
     }
 
     return res.json({
-      message: "Movie watchlist updated",
+      message: "Cinema watchlist updated",
       data: rows[0]
     });
   } catch (error) {
-    console.error("Failed to update movie watchlist:", error.message);
+    console.error("Failed to update cinema watchlist:", error.message);
     next(error);
   }
 });
 
 /**
  * DELETE /api/cinema/watchlist/:tmdbId
- * Remove movie from movie_watchlist with strict validation
+ * Remove item from movie_watchlist with strict validation
  */
 router.delete("/api/cinema/watchlist/:tmdbId", async (req, res, next) => {
   const tmdbCheck = validateTmdbId(req.params.tmdbId);
@@ -310,15 +317,15 @@ router.delete("/api/cinema/watchlist/:tmdbId", async (req, res, next) => {
     );
 
     if (rowCount === 0) {
-      return res.status(404).json({ error: "Movie not found in watchlist" });
+      return res.status(404).json({ error: "Item not found in cinema watchlist" });
     }
 
     return res.json({
-      message: "Movie removed from watchlist",
+      message: "Item removed from cinema watchlist",
       tmdb_id: tmdbCheck.value
     });
   } catch (error) {
-    console.error("Failed to remove movie from watchlist:", error.message);
+    console.error("Failed to remove item from cinema watchlist:", error.message);
     next(error);
   }
 });

@@ -130,34 +130,106 @@ async function tmdbFetch(endpoint, params = {}) {
 }
 
 /**
- * Discovery Endpoints (Movies Only)
+ * Normalizes both movie and tv objects to have unified title and release_date fields
  */
-export async function getTrendingMovies(timeWindow = "week", page = 1) {
-  return tmdbFetch(`/trending/movie/${timeWindow}`, { page });
+function normalizeMediaItem(item, defaultType = null) {
+  if (!item) return item;
+  const mediaType = item.media_type || defaultType || (item.name ? "tv" : "movie");
+  return {
+    ...item,
+    media_type: mediaType,
+    title: item.title || item.name || "Untitled",
+    original_title: item.original_title || item.original_name || item.title || item.name || "Untitled",
+    release_date: item.release_date || item.first_air_date || null
+  };
 }
 
-export async function getPopularMovies(page = 1) {
-  return tmdbFetch("/movie/popular", { page });
+function normalizeCinemaDetails(data, type) {
+  if (!data) return data;
+  return {
+    ...data,
+    media_type: type,
+    title: data.title || data.name || "Untitled",
+    original_title: data.original_title || data.original_name || data.title || data.name || "Untitled",
+    release_date: data.release_date || data.first_air_date || null,
+    runtime: data.runtime ?? (Array.isArray(data.episode_run_time) && data.episode_run_time.length > 0 ? data.episode_run_time[0] : null)
+  };
 }
 
-export async function getTopRatedMovies(page = 1) {
-  return tmdbFetch("/movie/top_rated", { page });
+/**
+ * Unified Search Endpoint (Movies and TV Shows mixed together)
+ */
+export async function searchMulti(query, page = 1, filterOutPeople = true) {
+  const data = await tmdbFetch("/search/multi", {
+    query,
+    include_adult: false,
+    page
+  });
+
+  if (data && Array.isArray(data.results)) {
+    let results = data.results;
+    if (filterOutPeople) {
+      results = results.filter(
+        (item) => item.media_type === "movie" || item.media_type === "tv"
+      );
+    }
+    data.results = results.map((item) => normalizeMediaItem(item));
+  }
+
+  return data;
 }
 
-export async function getUpcomingMovies(page = 1) {
-  return tmdbFetch("/movie/upcoming", { page });
+/**
+ * Discovery Endpoints
+ */
+export async function getTrendingCinema(timeWindow = "week", page = 1, mediaType = "all") {
+  const data = await tmdbFetch(`/trending/${mediaType}/${timeWindow}`, { page });
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results
+      .filter((item) => item.media_type !== "person")
+      .map((item) => normalizeMediaItem(item, mediaType === "movie" ? "movie" : null));
+  }
+  return data;
 }
 
-export async function getNowPlayingMovies(page = 1) {
-  return tmdbFetch("/movie/now_playing", { page });
+export async function getPopularCinema(page = 1) {
+  const data = await tmdbFetch("/movie/popular", { page });
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, "movie"));
+  }
+  return data;
 }
 
-export async function getMovieGenres() {
+export async function getTopRatedCinema(page = 1) {
+  const data = await tmdbFetch("/movie/top_rated", { page });
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, "movie"));
+  }
+  return data;
+}
+
+export async function getUpcomingCinema(page = 1) {
+  const data = await tmdbFetch("/movie/upcoming", { page });
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, "movie"));
+  }
+  return data;
+}
+
+export async function getNowPlayingCinema(page = 1) {
+  const data = await tmdbFetch("/movie/now_playing", { page });
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, "movie"));
+  }
+  return data;
+}
+
+export async function getCinemaGenres() {
   const data = await tmdbFetch("/genre/movie/list");
   return data.genres || [];
 }
 
-export async function discoverMoviesByGenre(genreId, page = 1, sortBy = "popularity.desc") {
+export async function discoverCinemaByGenre(genreId, page = 1, sortBy = "popularity.desc") {
   const params = {
     sort_by: sortBy,
     include_adult: false,
@@ -167,35 +239,97 @@ export async function discoverMoviesByGenre(genreId, page = 1, sortBy = "popular
   if (genreId) {
     params.with_genres = genreId;
   }
-  return tmdbFetch("/discover/movie", params);
+  const data = await tmdbFetch("/discover/movie", params);
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, "movie"));
+  }
+  return data;
 }
 
 /**
- * Search Endpoints (Movies Only)
+ * Details & Sub-resources (Supports both Movies and TV Shows)
  */
-export async function searchMovies(query, page = 1) {
-  return tmdbFetch("/search/movie", {
-    query,
-    include_adult: false,
-    page
-  });
+export async function getCinemaDetails(tmdbId, mediaType = "movie") {
+  const isExplicitTv = mediaType === "tv";
+  const isExplicitMovie = mediaType === "movie";
+
+  if (isExplicitTv) {
+    const data = await tmdbFetch(`/tv/${tmdbId}`);
+    return normalizeCinemaDetails(data, "tv");
+  }
+
+  if (isExplicitMovie) {
+    const data = await tmdbFetch(`/movie/${tmdbId}`);
+    return normalizeCinemaDetails(data, "movie");
+  }
+
+  // If mediaType is unspecified, try movie first, then fallback to TV
+  try {
+    const data = await tmdbFetch(`/movie/${tmdbId}`);
+    return normalizeCinemaDetails(data, "movie");
+  } catch (movieErr) {
+    if (movieErr.status === 404) {
+      const tvData = await tmdbFetch(`/tv/${tmdbId}`);
+      return normalizeCinemaDetails(tvData, "tv");
+    }
+    throw movieErr;
+  }
 }
 
-/**
- * Details & Sub-resources
- */
-export async function getMovieDetails(tmdbId) {
-  return tmdbFetch(`/movie/${tmdbId}`);
+export async function getCinemaCredits(tmdbId, mediaType = "movie") {
+  const endpoint = mediaType === "tv" ? `/tv/${tmdbId}/credits` : `/movie/${tmdbId}/credits`;
+  try {
+    return await tmdbFetch(endpoint);
+  } catch (err) {
+    if (err.status === 404 && mediaType !== "tv") {
+      return await tmdbFetch(`/tv/${tmdbId}/credits`);
+    }
+    throw err;
+  }
 }
 
-export async function getMovieCredits(tmdbId) {
-  return tmdbFetch(`/movie/${tmdbId}/credits`);
+export async function getCinemaVideos(tmdbId, mediaType = "movie") {
+  const endpoint = mediaType === "tv" ? `/tv/${tmdbId}/videos` : `/movie/${tmdbId}/videos`;
+  try {
+    return await tmdbFetch(endpoint);
+  } catch (err) {
+    if (err.status === 404 && mediaType !== "tv") {
+      return await tmdbFetch(`/tv/${tmdbId}/videos`);
+    }
+    throw err;
+  }
 }
 
-export async function getMovieVideos(tmdbId) {
-  return tmdbFetch(`/movie/${tmdbId}/videos`);
+export async function getCinemaRecommendations(tmdbId, page = 1, mediaType = "movie") {
+  const endpoint = mediaType === "tv" ? `/tv/${tmdbId}/recommendations` : `/movie/${tmdbId}/recommendations`;
+  let data;
+  try {
+    data = await tmdbFetch(endpoint, { page });
+  } catch (err) {
+    if (err.status === 404 && mediaType !== "tv") {
+      data = await tmdbFetch(`/tv/${tmdbId}/recommendations`, { page });
+    } else {
+      throw err;
+    }
+  }
+
+  if (data && Array.isArray(data.results)) {
+    data.results = data.results.map((item) => normalizeMediaItem(item, mediaType));
+  }
+
+  return data;
 }
 
-export async function getMovieRecommendations(tmdbId, page = 1) {
-  return tmdbFetch(`/movie/${tmdbId}/recommendations`, { page });
-}
+// Aliases for backwards compatibility with previous imports
+export const searchMovies = searchMulti;
+export const getTrendingMovies = getTrendingCinema;
+export const getPopularMovies = getPopularCinema;
+export const getTopRatedMovies = getTopRatedCinema;
+export const getUpcomingMovies = getUpcomingCinema;
+export const getNowPlayingMovies = getNowPlayingCinema;
+export const getMovieGenres = getCinemaGenres;
+export const discoverMoviesByGenre = discoverCinemaByGenre;
+export const getMovieDetails = getCinemaDetails;
+export const getMovieCredits = getCinemaCredits;
+export const getMovieVideos = getCinemaVideos;
+export const getMovieRecommendations = getCinemaRecommendations;
