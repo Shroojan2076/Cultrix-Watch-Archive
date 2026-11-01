@@ -54,10 +54,20 @@ export default function CinemaExplore() {
   if (urlQuery !== prevUrlQuery) {
     setPrevUrlQuery(urlQuery);
     setInputQuery(urlQuery);
-    if (urlQuery.trim()) {
-      setSortBy("relevance");
-    }
   }
+
+  // Debounced live search as user types
+  useEffect(() => {
+    if (inputQuery === urlQuery) return;
+    const timer = setTimeout(() => {
+      if (inputQuery.trim()) {
+        setSearchParams({ q: inputQuery.trim() });
+      } else if (urlQuery) {
+        setSearchParams({});
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [inputQuery, urlQuery, setSearchParams]);
 
   useEffect(() => {
     let isMounted = true;
