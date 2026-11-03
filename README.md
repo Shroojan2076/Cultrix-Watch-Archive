@@ -1,4 +1,4 @@
-# CULTRIX // CULTURE + MATRIX
+# CULTRIX - CULTURE + MATRIX
 ### Dual-Medium Visual Culture Discovery Platform (Anime + Cinema)
 
 ```text
