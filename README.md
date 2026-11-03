@@ -13,6 +13,19 @@
 > **Culture Has No Boundaries.**  
 > An independent discovery platform and personal registry for visual culture across **Animation** and **Cinema**.
 
+[![Live Production](https://img.shields.io/badge/Live%20App-cultrix.shroojan.in-E23826?style=for-the-badge&logo=vercel&logoColor=white)](https://cultrix.shroojan.in)
+[![Anime Portal](https://img.shields.io/badge/Anime%20Archive-cultrix.shroojan.in%2Fanime-E23826?style=for-the-badge)](https://cultrix.shroojan.in/anime)
+[![Cinema Portal](https://img.shields.io/badge/Cinema%20Archive-cultrix.shroojan.in%2Fcinema-E5A93C?style=for-the-badge)](https://cultrix.shroojan.in/cinema)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Cultrix--Watch--Archive-181C22?style=for-the-badge&logo=github)](https://github.com/Shroojan2076/Cultrix-Watch-Archive)
+
+---
+
+## Live Deployments
+
+* **Production Application:** [cultrix.shroojan.in](https://cultrix.shroojan.in)
+* **Anime Portal:** [cultrix.shroojan.in/anime](https://cultrix.shroojan.in/anime)
+* **Cinema Portal:** [cultrix.shroojan.in/cinema](https://cultrix.shroojan.in/cinema)
+
 ---
 
 ## Overview
@@ -20,7 +33,7 @@
 **CULTRIX** (derived from **CULTURE + MATRIX**) is a decoupled, full-stack visual culture platform that brings together two distinct artistic mediums under one brand identity:
 
 1. **ANIME MODE**: An expressive Tokyo underground publication aesthetic powered by the official **MyAnimeList API v2**.
-2. **CINEMA MODE**: A 35mm cinémathèque aesthetic powered by **The Movie Database (TMDB) API**.
+2. **CINEMA MODE**: A 35mm cinémathèque aesthetic powered by **The Movie Database (TMDB) API** (supporting both feature films and television series).
 
 Both mediums share the **CULTRIX** brand shell, unified navigation, and mode switcher, while maintaining strictly separated content catalogues, discovery patterns, details architectures, watchlists, and database storage.
 
@@ -38,35 +51,64 @@ CULTRIX features a dynamic dual-environment theme engine that transforms the int
 | **Matrix X Logo** | Sharp graphic print matrix with diagonal velocity | 35mm celluloid film strip with sprocket perforations & projector aperture |
 | **Wordmark Accenting** | `CULTRI`<span style="color:#E23826">`X`</span> in Vermilion | `CULTRI`<span style="color:#E5A93C">`X`</span> in Film Gold |
 | **Browser Favicon** | Dynamic `/favicon.svg` (Print Matrix) | Dynamic `/favicon-cinema.svg` (35mm Celluloid) |
-| **Content Engine** | MyAnimeList API v2 (Japanese Animation) | The Movie Database TMDB API (Global Cinema) |
+| **Content Engine** | MyAnimeList API v2 (Japanese Animation) | The Movie Database TMDB API (Global Cinema & TV) |
 
 ---
 
 ## Key Features
 
 ### 1. Unified Application Shell & Mode Switcher
-* **One-Click Mode Switcher:** Instantly toggle between `ANIME` and `CINEMA` with context-preserving route transitions (`/anime/*` $\leftrightarrow$ `/cinema/*`).
-* **Backward-Compatible Persistence:** Preserves user mode in `localStorage` under `cultrix_mode` (with fallback to legacy preferences).
+* **One-Click Mode Switcher:** Instantly toggle between `ANIME` and `CINEMA` with context-preserving route transitions (`/anime/*` ⇄ `/cinema/*`).
+* **Backward-Compatible Persistence:** Preserves user mode in `localStorage` under `cultrix_mode` (with fallback to legacy preferences `yugen_index_mode`).
 * **Responsive Navigation:** Clean desktop navigation bar and mobile drawer with quick access to Home, Explore, and Watchlists.
 
 ### 2. Anime Experience (Tokyo Underground)
-* **English-First Title Resolution:** Intelligently prioritizes English titles (`alternative_titles.en`), falling back gracefully to canonical titles.
-* **Monumental Spotlight Hero:** Showcases seasonal flagship series with backdrop art, Japanese typographic mark, synopsis, and instant watchlist CTA.
+* **English-First Title Resolution:** Intelligently prioritizes English titles (`alternative_titles.en`), falling back gracefully to canonical titles and romanized synonyms.
+* **Monumental Spotlight Hero:** Showcases flagship seasonal series with backdrop art, Japanese typographic mark, synopsis, and instant watchlist CTA.
 * **High-Contrast Paper Slab:** Curated selections presented on aged paper contrast slabs with bespoke typography.
-* **Explore & Search:** Filter by curated themes (Cyberpunk, Psychological, Retro, Mecha, Dark Fantasy, Seinen), toggle between 2:3 poster grid and list rows.
-* **4-Section Details Architecture:** Hero banner, interactive watchlist action deck, full synopsis, and technical specifications.
+* **Explore & Search:** Filter by curated themes (Cyberpunk, Psychological, Action, Sci-Fi, Mecha, Retro Classics, Dark Fantasy, Seinen), toggle between 2:3 poster grid and list rows.
+* **4-Section Details Architecture:** Hero banner, interactive watchlist action deck, full synopsis, and technical specifications (status, studio, episodes, broadcast period).
 * **Episode Watchlist:** Tracks viewing status (`Watching`, `Completed`, `Plan to Watch`, `On Hold`, `Dropped`), with one-click `+1 ep` progress increments and personal 1–10 ratings.
 
 ### 3. Cinema Experience (35mm Cinémathèque)
-* **Widescreen 16:9 Hero:** Dynamic backdrop presentation of trending canonical films with director/runtime specs.
+* **Widescreen 16:9 Hero:** Dynamic backdrop presentation of trending canonical works with director/runtime specs.
 * **Weekly Trending Stills:** 16:9 cinematic still cards with celluloid vignetting and TMDB community scores.
-* **Genre Discovery:** Instant filtering across Sci-Fi, Action, Thriller, Drama, Horror, Crime, and Animation.
-* **Film Dossier Details:** Backdrop imagery, cast & crew credits, trailers/videos, release dates, and runtime specifications.
+* **Multi-Media Catalogue:** Comprehensive coverage of both feature films and TV shows with normalized runtime and metadata resolution.
+* **Genre Discovery:** Instant filtering across Sci-Fi, Action, Thriller, Drama, Horror, Crime, Mystery, Adventure, and Animation.
+* **Film Dossier Details:** High-resolution backdrop imagery, cast & crew credits (directors & series creators), embedded official YouTube trailers, release dates, budget/revenue stats, and runtime specifications.
 * **Cinémathèque Personal Archive Watchlist:**
   * Widescreen landscape still frames with atmospheric celluloid vignettes.
   * Archival ledger statuses: `● SCREENED` (Amber glow) vs. `○ QUEUED` (Silver).
-  * Metadata hierarchy: Classification, Release Year, Runtime in minutes, Genres, and TMDB Community Rating.
-  * Interactive controls: Instant status toggle (`✓ Screened`), personal 1–10 star rating selector, direct dossier link, and deletion.
+  * Metadata hierarchy: Classification/Media Type, Release Year, Runtime in minutes, Genres, and TMDB Community Rating.
+  * Interactive controls: Instant status toggle (`✓ Screened` / `Queue`), personal 1–10 star rating selector, direct dossier link, and deletion.
+
+---
+
+## Screenshots & Interface Tour
+
+### ⛩️ Anime Experience (Tokyo Underground Publication Aesthetic)
+
+#### Home & Thematic Spotlight
+![Anime Mode - Home Page](screenshots/cultrix-anime-homepage.png)
+
+#### Anime Details Dossier & Action Deck
+![Anime Mode - Details Page](screenshots/cultrix-anime-detailspage.png)
+
+#### Personal Episode Watchlist & Ledger
+![Anime Mode - Watchlist](screenshots/cultrix-anime-watchlist.png)
+
+---
+
+### 🎬 Cinema Experience (35mm Cinémathèque Aesthetic)
+
+#### Widescreen Trending & Curated Genres
+![Cinema Mode - Home Page](screenshots/cultrix-cinema-homepage.png)
+
+#### Film Dossier, Technical Specs & Trailers
+![Cinema Mode - Details Page](screenshots/cultrix-cinema-detailspage.png)
+
+#### Cinémathèque Personal Archive & Screening Ledger
+![Cinema Mode - Watchlist](screenshots/cultrix-cinema-watchlist.png)
 
 ---
 
@@ -74,10 +116,10 @@ CULTRIX features a dynamic dual-environment theme engine that transforms the int
 
 ```text
 +--------------------------------------------------------------------------+
-|                       CULTRIX Client (React 19 + Vite)                   |
+|                       CULTRIX Client (React 19 + Vite 8)                 |
 |  - ModeContext: dynamic theme switcher (anime / cinema), localStorage    |
 |  - Dynamic CULTRIX X Symbol: morphs vector geometry & colors per mode    |
-|  - Pure Vanilla CSS Design Tokens (theme.css + style.css)                |
+|  - Tailwind CSS v4 & Modular Design Tokens (theme.css + style.css)       |
 |  - React Router 7: dedicated /anime/* and /cinema/* route namespaces     |
 +------------------------------------+-------------------------------------+
                                      |
@@ -85,19 +127,19 @@ CULTRIX features a dynamic dual-environment theme engine that transforms the int
                                      v
 +--------------------------------------------------------------------------+
 |                       Server (Node.js + Express 5)                       |
-|  - Constrained project CORS allowlist (strict preview regex security)   |
-|  - In-memory TTL caching for third-party API rate-limit resilience       |
+|  - CORS middleware configured with CLIENT_URL origin credentials         |
+|  - In-memory TTL caching (5 min) & request deduplication for TMDB API    |
 |  - Dedicated route modules: /search, /anime, /watchlist, /api/cinema/*   |
 +------------------+------------------------------------+------------------+
                    |                                    |
-       SQL Queries | (node-pg pool)         HTTP / REST | (API Key / Client ID)
+       SQL Queries | (node-pg pool)         HTTP / REST | (Axios Client)
                    v                                    v
 +--------------------------------------+   +-------------------------------+
 |      PostgreSQL (Neon Cloud DB)      |   |        External APIs          |
-|  - anime (cached MAL metadata)       |   |  - MyAnimeList API v2         |
-|  - watchlist (anime episode tracking)|   |  - The Movie Database (TMDB)  |
-|  - movie_watchlist (film archive)    |   +-------------------------------+
-+--------------------------------------+
+|  - anime (cached MAL metadata)       |   |  - MyAnimeList API v2 (Axios) |
+|  - watchlist (anime episode tracking)|   |  - The Movie Database TMDB    |
+|  - movie_watchlist (film archive)    |   |    (Axios + In-Memory Cache)  |
++--------------------------------------+   +-------------------------------+
 ```
 
 ---
@@ -106,23 +148,23 @@ CULTRIX features a dynamic dual-environment theme engine that transforms the int
 
 ### Frontend (`/client`)
 * **Framework:** React 19, JavaScript (ESModules)
-* **Build Tool:** Vite 8 (production bundle builds in ~200ms)
+* **Build Tool:** Vite 8 (optimized production bundle builds in ~200ms)
 * **Routing:** React Router DOM v7 (with `vercel.json` SPA rewrite rules)
-* **Styling:** Modular Vanilla CSS & CSS Custom Properties (`theme.css` + `style.css`)
+* **Styling:** Tailwind CSS v4 (`@tailwindcss/vite`) + Modular CSS Custom Properties (`theme.css` + `style.css`)
   * Dynamic theme tokens (`[data-theme="anime"]` vs. `[data-theme="cinema"]`)
-  * Typography: `Space Grotesk`, `Syne`, `Cinzel`, `Cormorant Garamond`, `JetBrains Mono`, `Bebas Neue`
-  * Fully decoupled component classes: `.film-card`, `.film-row-card`, `.film-archive-*` vs. `.anime-card`, `.anime-row-card`, `.watchlist-*`
+  * Typography: `Space Grotesk`, `Syne`, `Cinzel`, `Cormorant Garamond`, `JetBrains Mono`, `Bebas Neue`, `Noto Sans JP`, `Plus Jakarta Sans`
+  * Decoupled component styles: `.film-card`, `.film-row-card`, `.film-archive-*` vs. `.anime-card`, `.anime-row-card`, `.watchlist-*`
 
 ### Backend (`/server`)
-* **Runtime:** Node.js (v20+)
+* **Runtime:** Node.js (v18+)
 * **Framework:** Express 5
-* **Security:** Hardened CORS policy with strict project-level Vercel preview regex validation
-* **Database Driver:** `pg` (node-postgres connection pool with SSL handling)
-* **External Clients:** Native `fetch` with in-memory caching for TMDB and MAL APIs
+* **Security:** Configured CORS policy matching client origin with credentials and strict HTTP methods
+* **Database Driver:** `pg` (node-postgres connection pool with automatic SSL negotiation for cloud Postgres)
+* **External HTTP Clients:** Axios (`axios`) with in-memory TTL caching and concurrent in-flight request deduplication for TMDB
 
-### Database (Neon PostgreSQL)
-* **Provider:** Serverless PostgreSQL on Neon.tech
-* **Isolation:** Strict separation between Anime tables and Cinema tables. Zero cross-medium data interference.
+### Database (PostgreSQL / Neon)
+* **Provider:** Serverless PostgreSQL on [Neon.tech](https://neon.tech) (or local PostgreSQL)
+* **Isolation:** Strict isolation between Anime tables (`anime`, `watchlist`) and Cinema tables (`movie_watchlist`). Zero shared foreign keys or cross-medium interference.
 
 ---
 
@@ -167,13 +209,14 @@ CREATE TABLE IF NOT EXISTS movie_watchlist (
     backdrop_path TEXT,
     release_date VARCHAR(50),
     runtime INT,
-    status VARCHAR(50) DEFAULT 'want_to_watch' NOT NULL,
-    score NUMERIC(3, 1),
+    status VARCHAR(50) DEFAULT 'want_to_watch',
+    score DECIMAL(3, 1),
     overview TEXT,
-    genres TEXT[],
-    vote_average NUMERIC(3, 1),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    genres JSONB DEFAULT '[]'::jsonb,
+    vote_average DECIMAL(3, 1),
+    media_type VARCHAR(50) DEFAULT 'movie',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 ```
 
@@ -184,29 +227,32 @@ CREATE TABLE IF NOT EXISTS movie_watchlist (
 ### Anime Endpoints (MyAnimeList Integration)
 | Method | Endpoint | Query / Body Params | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/` | `{ "query": "<term>" }` | Search anime catalog via MAL API |
-| `GET` | `/ranking` | `?type=all&limit=10` | Top/airing/popular anime ranking |
-| `GET` | `/next` | `?url=<mal_url>` | Fetches next page of MAL results |
-| `GET` | `/anime/:mal_id` | `:mal_id` | Returns complete anime details + watchlist status |
-| `GET` | `/watchlist` | None | Retrieves all saved anime entries |
-| `POST` | `/watchlist/add` | `{ mal_id, title, poster, ... }` | Adds anime to watchlist |
-| `PUT` | `/watchlist/:mal_id` | `{ status, episodes_watched, score }` | Updates progress, rating, or watch status |
-| `DELETE` | `/watchlist/:mal_id`| None | Removes anime from watchlist |
+| `GET` | `/?q=<term>` | `?q=<term>` or `?query=<term>` | Search anime catalog via query parameters |
+| `POST` | `/` | `{ "query": "<term>" }` | Search anime catalog via JSON body |
+| `GET` | `/ranking` | `?type=all&limit=10` | Top/airing/popular anime ranking (`all`, `airing`, `bypopularity`, etc.) |
+| `GET` | `/next` | `?url=<mal_url>` | Fetches next page of MAL pagination results |
+| `GET` | `/anime/:mal_id` | `:mal_id` | Returns complete anime details + current watchlist status |
+| `GET` | `/watchlist` | None | Retrieves all saved anime watchlist entries |
+| `POST` | `/watchlist/add` | `{ mal_id, title, poster, media_type, ... }` | Adds anime to personal library |
+| `PUT` | `/watchlist/:mal_id` | `{ status, episodes_watched, score }` | Updates watch progress, rating, or status |
+| `DELETE` | `/watchlist/:mal_id`| None | Removes anime from personal library |
 
 ### Cinema Endpoints (TMDB Integration)
 | Method | Endpoint | Query / Body Params | Description |
 | :--- | :--- | :--- | :--- |
-| `GET` | `/api/cinema/trending` | `?time_window=week&page=1` | Weekly trending cinema |
+| `GET` | `/api/cinema/trending` | `?window=week&page=1&type=all` | Trending cinema & TV (`window=week\|day`, `type=all\|movie\|tv`) |
 | `GET` | `/api/cinema/popular` | `?page=1` | Currently popular feature films |
 | `GET` | `/api/cinema/top-rated` | `?page=1` | Canonical all-time top rated masterworks |
+| `GET` | `/api/cinema/upcoming` | `?page=1` | Upcoming theatrical and cinema releases |
+| `GET` | `/api/cinema/now-playing` | `?page=1` | Films currently playing in theatres |
 | `GET` | `/api/cinema/genres` | None | Curated TMDB film genres |
-| `GET` | `/api/cinema/discover` | `?genre_id=<id>&sort_by=<sort>&page=1` | Explores films by genre and sorting index |
-| `GET` | `/api/cinema/search` | `?q=<term>&page=1` | Searches TMDB movie database |
-| `GET` | `/api/cinema/movie/:id`| `:id` | Full film dossier: cast, crew, videos, specs |
-| `GET` | `/api/cinema/watchlist`| None | Retrieves personal cinémathèque film registry |
-| `POST` | `/api/cinema/watchlist/add` | `{ tmdb_id, title, status, ... }` | Registers film in personal archive |
-| `PUT` | `/api/cinema/watchlist/:id` | `{ status, score }` | Updates screening status or personal rating |
-| `DELETE`| `/api/cinema/watchlist/:id`| None | Removes film from personal archive |
+| `GET` | `/api/cinema/discover` | `?genre_id=<id>&sort_by=<sort>&page=1` | Explores films by genre and sorting criterion |
+| `GET` | `/api/cinema/search` | `?q=<term>&page=1` | Multi-search across TMDB titles (movies & TV series) |
+| `GET` | `/api/cinema/movie/:tmdbId`| `:tmdbId`, optional `?type=movie\|tv` | Full dossier: cast, crew, trailers, recommendations & watch status |
+| `GET` | `/api/cinema/watchlist`| None | Retrieves personal cinémathèque film & TV registry |
+| `POST` | `/api/cinema/watchlist/add` | `{ tmdb_id, title, status, score, ... }` | Registers film or TV series in personal archive |
+| `PUT` | `/api/cinema/watchlist/:tmdbId` | `{ status, score }` | Updates screening status (`want_to_watch` / `watched`) or score |
+| `DELETE`| `/api/cinema/watchlist/:tmdbId`| None | Removes item from personal archive |
 
 ---
 
@@ -214,14 +260,14 @@ CREATE TABLE IF NOT EXISTS movie_watchlist (
 
 ### Prerequisites
 * **Node.js** (v18.0.0 or higher)
-* **PostgreSQL** (running locally on port 5432, or a free [Neon](https://neon.tech) connection string)
-* **TMDB API Key** (v3 auth from [themoviedb.org](https://www.themoviedb.org/settings/api))
+* **PostgreSQL** (running locally on port 5432, or a free [Neon](https://neon.tech) serverless instance)
+* **TMDB API Key** (v3 auth from [themoviedb.org/settings/api](https://www.themoviedb.org/settings/api))
 * **MyAnimeList Client ID** (from [myanimelist.net/apiconfig](https://myanimelist.net/apiconfig))
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/Shroojan2076/anime-website.git
-cd anime-website
+git clone https://github.com/Shroojan2076/Cultrix-Watch-Archive.git
+cd Cultrix-Watch-Archive
 ```
 
 ### 2. Configure & Run Backend (`/server`)
@@ -230,29 +276,36 @@ cd server
 npm install
 ```
 
-Create a `.env` file in `server/`:
+Create a `.env` file in the `server/` directory:
 ```env
 PORT=3000
 
-# PostgreSQL Connection String (Neon Cloud or Local)
-DATABASE_URL=postgresql://user:password@host/database?sslmode=require
+# PostgreSQL Connection String (Option 1: Neon Cloud or Hosted Postgres)
+DATABASE_URL=postgresql://user:password@ep-xyz.neon.tech/neondb?sslmode=require
+
+# Local PostgreSQL Configuration (Option 2: Local fallback when DATABASE_URL is unset)
+# PG_HOST=localhost
+# PG_PORT=5432
+# PG_USER=postgres
+# PG_PASSWORD=your_local_password
+# PG_DATABASE=myanimesite
 
 # External API Keys
-MAL_CLIENT_ID=your_mal_client_id
-MAL_CLIENT_SECRET=your_mal_client_secret
-TMDB_API_KEY=your_tmdb_api_key
+MAL_CLIENT_ID=your_mal_client_id_here
+MAL_CLIENT_SECRET=your_mal_client_secret_here
+TMDB_API_KEY=your_tmdb_api_key_v3_here
 
-# CORS Allowed Origins (Comma-separated in production)
+# Client URL for CORS (Set to your client URL; e.g., http://localhost:5173 or production domain)
 CLIENT_URL=http://localhost:5173
 ```
 
 Start the backend server:
 ```bash
 npm run dev
-# or
+# or for production:
 npm start
 ```
-The server will start at `http://localhost:3000` and automatically verify database tables.
+The server will start at `http://localhost:3000` and automatically verify and initialize database tables.
 
 ### 3. Configure & Run Frontend (`/client`)
 Open a new terminal:
@@ -263,6 +316,7 @@ npm install
 
 (Optional) Create a `.env` file in `client/`:
 ```env
+# Defaults to http://localhost:3000 if not specified
 VITE_API_URL=http://localhost:3000
 ```
 
@@ -279,13 +333,14 @@ Open `http://localhost:5173` in your browser.
 
 * **ESLint:** Run `npm --prefix client run lint` (0 errors, 0 warnings).
 * **Production Build:** Run `npm --prefix client run build` (builds cleanly in ~200ms).
-* **CORS Security:** Tested against allowed origins and unauthorized origins (`403 Forbidden`).
+* **Cross-Browser Verification:** Tested for dynamic SVG favicons, mode switching, and theme token transitions.
 
 ---
 
 ## Author & License
 
-* **Created by:** Shroojan Dhok
+* **Created by:** [Shroojan Dhok](https://github.com/Shroojan2076)
 * **GitHub:** [@Shroojan2076](https://github.com/Shroojan2076)
 * **LinkedIn:** [@shroojan-dhok-679a73377](https://www.linkedin.com/in/shroojan-dhok-679a73377/)
-* **Repository:** [https://github.com/Shroojan2076/anime-website](https://github.com/Shroojan2076/anime-website)
+* **Repository:** [https://github.com/Shroojan2076/Cultrix-Watch-Archive](https://github.com/Shroojan2076/Cultrix-Watch-Archive)
+* **License:** [ISC](https://opensource.org/license/isc-license-txt)
